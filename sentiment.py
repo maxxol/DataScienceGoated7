@@ -117,10 +117,3 @@ plt.plot()
 plt.imshow(wordcloud, interpolation="bilinear")
 plt.axis("off")
 plt.show()
-    
-# Unify Text from tweets of different sentiment
-text = filtered_data[filtered_data['Sentiment']=='Negative']['Tweet'].str.cat(sep=' ')
-plt.plot()
-plt.imshow(wordcloud, interpolation="bilinear")
-plt.axis("off")
-plt.show()
