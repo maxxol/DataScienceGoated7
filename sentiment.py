@@ -8,14 +8,15 @@ from textblob import TextBlob
 import math
 
 
+
+# Importing the dataset and setting up pandas
 pd.set_option('display.max_colwidth', 255)
-# Importing the dataset
 DATASET_COLUMNS=['id','twitter message','identification label']
 DATASET_ENCODING = "ISO-8859-1"
-df = pd.read_csv('C:\\Users\\jtube\\Desktop\\data_science_data\\twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
+df = pd.read_csv('DataScienceGoated7\\twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
 del df['identification label'] #delete unused collumn
 
-datafilterkeyword = "war" #keyword by which to filter data
+datafilterkeyword = "police" #keyword by which to filter data
 filtered_data = df[df['twitter message'].str.contains(datafilterkeyword)] #filter data
 
 
@@ -26,6 +27,23 @@ class Mood: #class for the sentiment
     def __init__(self, emoji: str, sentiment: float):
         self.emoji = emoji #:D / :| / >:(
         self.sentiment = sentiment
+
+# Python3 program for Bubble Sort Algorithm Implementation source: https://www.geeksforgeeks.org/sorting-algorithms-in-python/
+def bubbleSort(arr):
+     
+    n = len(arr)
+ 
+    # For loop to traverse through all 
+    # element in an array
+    for i in range(n):
+        for j in range(0, n - i - 1):
+             
+            # Range of the array is from 0 to n-i-1
+            # Swap the elements if the element found 
+            #is greater than the adjacent element
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                 
 
 
 
@@ -68,8 +86,11 @@ for index, row in filtered_data.iterrows(): #for every row in the filtered data 
     totalsentimentvalues += 1
     sentimentarray.append(mood.sentiment)
 
-    #print(f'{mood.emoji}({mood.sentiment})') #print sentiment for every row
+
+bubbleSort(sentimentarray) #sort the sentimentarray to get median
+
 mediansentiment = round(sentimentarray[math.floor(len(sentimentarray)/2)],3)
+print(math.floor(math.floor(len(sentimentarray)/2)))
 averagesentiment = round(totalsentiment/totalsentimentvalues,3)
 standarddeviation = round(np.std(sentimentarray),3)
 
@@ -104,7 +125,3 @@ plt.plot()
 plt.imshow(wordcloud, interpolation="bilinear")
 plt.axis("off")
 plt.show()
-     
-
-
-     
