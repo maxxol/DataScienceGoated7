@@ -11,12 +11,15 @@ import math
 
 # Importing the dataset and setting up pandas
 pd.set_option('display.max_colwidth', 255)
-DATASET_COLUMNS=['id','twitter message','identification label']
+DATASET_COLUMNS=['target','id','date','flag','user','twitter message']
 DATASET_ENCODING = "ISO-8859-1"
-df = pd.read_csv('twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
-del df['identification label'] #delete unused collumn
+df = pd.read_csv('DataScienceGoated7\\twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
+del df['target'] #delete unused collumn
+del df['user'] #delete unused collumn
+del df['date'] #delete unused collumn
+del df['flag'] #delete unused collumn
 
-datafilterkeyword = "police" #keyword by which to filter data
+datafilterkeyword = "dylan" #keyword by which to filter data
 filtered_data = df[df['twitter message'].str.contains(datafilterkeyword)] #filter data
 
 
