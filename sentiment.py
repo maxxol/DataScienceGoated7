@@ -13,7 +13,7 @@ import math
 pd.set_option('display.max_colwidth', 255)
 DATASET_COLUMNS=['id','twitter message','identification label']
 DATASET_ENCODING = "ISO-8859-1"
-df = pd.read_csv('DataScienceGoated7\\twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
+df = pd.read_csv('twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
 del df['identification label'] #delete unused collumn
 
 datafilterkeyword = "police" #keyword by which to filter data
@@ -90,7 +90,6 @@ for index, row in filtered_data.iterrows(): #for every row in the filtered data 
 bubbleSort(sentimentarray) #sort the sentimentarray to get median
 
 mediansentiment = round(sentimentarray[math.floor(len(sentimentarray)/2)],3)
-print(math.floor(math.floor(len(sentimentarray)/2)))
 averagesentiment = round(totalsentiment/totalsentimentvalues,3)
 standarddeviation = round(np.std(sentimentarray),3)
 
