@@ -24,11 +24,9 @@ filtered_data = df[df['twitter message'].str.contains(datafilterkeyword)] #filte
 
 
 class Mood: #class for the sentiment
-    emoji: str
     sentiment: float
 
-    def __init__(self, emoji: str, sentiment: float):
-        self.emoji = emoji #:D / :| / >:(
+    def __init__(self, sentiment: float):
         self.sentiment = sentiment
 
 # Python3 program for Bubble Sort Algorithm Implementation source: https://www.geeksforgeeks.org/sorting-algorithms-in-python/
@@ -53,17 +51,14 @@ def bubbleSort(arr):
 def get_mood(input_text: str, *, threshold: float, totalpositive: int, totalneutral: int, totalnegative: int) -> tuple[Mood, int, int, int]: #sentiment generator
     sentiment: float = TextBlob(input_text).sentiment.polarity #generate the sentiment
 
-    friendly_threshold: float = threshold #set the positive and negative thresholds
-    hostile_threshold: float = -threshold
-
-    if sentiment >= friendly_threshold: #catagorize the sentiment to positive, negative and neutral
-        mood = Mood(':D  ', sentiment)
+    if sentiment >= threshold: #catagorize the sentiment to positive, negative and neutral
+        mood = Mood(sentiment)
         totalpositive += 1
-    elif sentiment <= hostile_threshold:
-        mood = Mood('>:(  ', sentiment)
+    elif sentiment <= -threshold:
+        mood = Mood(sentiment)
         totalnegative += 1
     else:
-        mood = Mood(':|  ', sentiment)
+        mood = Mood(sentiment)
         totalneutral += 1
 
     return mood, totalpositive, totalneutral, totalnegative
@@ -71,6 +66,7 @@ def get_mood(input_text: str, *, threshold: float, totalpositive: int, totalneut
 
 if __name__ == '__main__':
     #initiating variables
+    resultMood = ''
     totalsentiment = 0 #all sentiment added up
     totalsentimentvalues= 0 #number of collected sentiment values
     averagesentiment = 0 #total/collected
@@ -80,10 +76,12 @@ if __name__ == '__main__':
     totalneutral = 0 #neutral values
     totalnegative = 0 #negative values
     standarddeviation = 0 #standard deviation
+    threshold=0.15
+    
 
 for index, row in filtered_data.iterrows(): #for every row in the filtered data table
     text: str = row['twitter message'] #set the input text to the indexed twitter message
-    mood, totalpositive, totalneutral, totalnegative = get_mood(text, threshold=0.15, totalpositive=totalpositive, totalneutral=totalneutral, totalnegative=totalnegative) #generate the sentiment values
+    mood, totalpositive, totalneutral, totalnegative = get_mood(text, threshold=threshold, totalpositive=totalpositive, totalneutral=totalneutral, totalnegative=totalnegative) #generate the sentiment values
 
     totalsentiment += mood.sentiment
     totalsentimentvalues += 1
@@ -95,8 +93,14 @@ bubbleSort(sentimentarray) #sort the sentimentarray to get median
 mediansentiment = round(sentimentarray[math.floor(len(sentimentarray)/2)],3)
 averagesentiment = round(totalsentiment/totalsentimentvalues,3)
 standarddeviation = round(np.std(sentimentarray),3)
+if averagesentiment >= threshold: #catagorize the sentiment to positive, negative and neutral
+    resultMood = ':D'
+elif averagesentiment <= -threshold:
+    resultMood = '>:('
+else:
+    resultMood = ':|'
 
-print("--- sentiment for '" + datafilterkeyword + "'---\naverage sentiment value:",averagesentiment,mood.emoji,"\nmedian sentiment:",mediansentiment,"\nstandard deviation:",standarddeviation,"\n# pos/neu/neg:",totalpositive,"/",totalneutral,"/",totalnegative)
+print("--- sentiment for '" + datafilterkeyword + "'---\naverage sentiment value:",averagesentiment,resultMood,"\nmedian sentiment:",mediansentiment,"\nstandard deviation:",standarddeviation,"\n# pos/neu/neg:",totalpositive,"/",totalneutral,"/",totalnegative)
 
 
 # Unify Text from all weeks
