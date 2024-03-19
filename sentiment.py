@@ -13,13 +13,13 @@ import math
 pd.set_option('display.max_colwidth', 255)
 DATASET_COLUMNS=['target','id','date','flag','user','twitter message']
 DATASET_ENCODING = "ISO-8859-1"
-df = pd.read_csv('DataScienceGoated7\\twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
+df = pd.read_csv('twitterdata.csv', encoding=DATASET_ENCODING, names=DATASET_COLUMNS)
 del df['target'] #delete unused collumn
 del df['user'] #delete unused collumn
 del df['date'] #delete unused collumn
 del df['flag'] #delete unused collumn
 
-datafilterkeyword = "dylan" #keyword by which to filter data
+datafilterkeyword = " birthday " #keyword by which to filter data
 filtered_data = df[df['twitter message'].str.contains(datafilterkeyword)] #filter data
 
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
 for index, row in filtered_data.iterrows(): #for every row in the filtered data table
     text: str = row['twitter message'] #set the input text to the indexed twitter message
-    mood, totalpositive, totalneutral, totalnegative = get_mood(text, threshold=0.2, totalpositive=totalpositive, totalneutral=totalneutral, totalnegative=totalnegative) #generate the sentiment values
+    mood, totalpositive, totalneutral, totalnegative = get_mood(text, threshold=0.15, totalpositive=totalpositive, totalneutral=totalneutral, totalnegative=totalnegative) #generate the sentiment values
 
     totalsentiment += mood.sentiment
     totalsentimentvalues += 1
@@ -96,7 +96,7 @@ mediansentiment = round(sentimentarray[math.floor(len(sentimentarray)/2)],3)
 averagesentiment = round(totalsentiment/totalsentimentvalues,3)
 standarddeviation = round(np.std(sentimentarray),3)
 
-print("sentiment for",datafilterkeyword,":\naverage sentiment value:",averagesentiment,"\nmedian sentiment:",mediansentiment,"\nstandard deviation:",standarddeviation,"\n# pos/neu/neg:",totalpositive,"/",totalneutral,"/",totalnegative)
+print("--- sentiment for '" + datafilterkeyword + "'---\naverage sentiment value:",averagesentiment,mood.emoji,"\nmedian sentiment:",mediansentiment,"\nstandard deviation:",standarddeviation,"\n# pos/neu/neg:",totalpositive,"/",totalneutral,"/",totalnegative)
 
 
 # Unify Text from all weeks
