@@ -6,9 +6,8 @@ from sqlalchemy import create_engine
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
-
+#the line 10,11 and 20 are commented out due to postgres issues on Jeroen's end while making this merging the sentiment and dashapp parts. 
 #dbengine = create_engine('postgresql://postgres:root@localhost/test')
-
 #dt = pd.read_sql('SELECT * FROM stuff.stuff', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css'])
@@ -18,6 +17,7 @@ pageB = html.Div(children=[
     dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
     html.Div(id='output-container', style={'display': 'flex'}, children=[
         dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
+        #html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
     ])
 ])
 
