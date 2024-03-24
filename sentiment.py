@@ -1,17 +1,18 @@
-# sentiment_analysis.py
-
 import numpy as np
 import pandas as pd
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 from textblob import TextBlob
 import math
+import base64
+import io
 import os
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the absolute path to twitterdata.csv
 csv_path = os.path.join(current_dir, 'twitterdata.csv')
+
 def analyze_sentiment(datafilterkeyword: str):
     # Importing the dataset and setting up pandas
     pd.set_option('display.max_colwidth', 255)
@@ -106,15 +107,19 @@ def analyze_sentiment(datafilterkeyword: str):
     plt.rcParams["figure.figsize"] = (7, 4)
 
     # Make Wordcloud
-    wordcloud = WordCloud(max_font_size=50, max_words=80, background_color="white", stopwords=new_stopwords,
+    wordcloud = WordCloud(max_font_size=50, max_words=8000, background_color="white", stopwords=new_stopwords,
                           colormap='jet').generate(text)
 
-    # Plot Wordcloud
-    plt.plot()
-    plt.imshow(wordcloud, interpolation="bilinear")
-    plt.axis("off")
-    plt.show()
+    # Encode Word Cloud Image to Base64
+    img = io.BytesIO()
+    wordcloud.to_image().save(img, format='PNG')
+    wordcloud_base64 = base64.b64encode(img.getvalue()).decode('utf-8')
 
-# Call the function with the desired datafilterkeyword
-if __name__ == '__main__':
-    analyze_sentiment("birthday")
+    # Return sentiment analysis results and word cloud image in base64 format
+    sentiment_results = f"Sentiment Analysis Results for '{datafilterkeyword}':\n" \
+                        f"Average sentiment value: {averagesentiment} {resultMood}\n" \
+                        f"Median sentiment: {mediansentiment}\n" \
+                        f"Standard deviation: {standarddeviation}\n" \
+                        f"Number of positive/neutral/negative tweets: {totalpositive}/{totalneutral}/{totalnegative}\n"
+                        
+    return sentiment_results, wordcloud_base64

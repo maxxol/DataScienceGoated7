@@ -18,7 +18,6 @@ pageB = html.Div(children=[
     dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
     html.Div(id='output-container', style={'display': 'flex'}, children=[
         dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
-        #html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
     ])
 ])
 
@@ -28,8 +27,8 @@ pageC = html.Div(children=[
         dcc.Input(id='keyword-input', type='text', placeholder='Enter keyword'),
         html.Button('Analyze Sentiment', id='analyze-button', n_clicks=0)
     ]),
-    html.Div(id='sentiment-results'),
-    html.Div(id='keyword-input-previous', style={'display': 'none'})  # Hidden div to store previous keyword value
+    html.Div(id='sentiment-results'),  # Placeholder for sentiment analysis results
+    html.Div(id='wordcloud-container')  # Placeholder for word cloud image
 ])
 
 pages = {
@@ -54,27 +53,27 @@ app.layout = html.Div(children=[
 def display_page(pathname):
     return pages.get(pathname, {'content': html.Div(children="404")})['content']
 
-# Callback to update sentiment results
+# Callback to update sentiment results and word cloud
 @app.callback(
     Output('sentiment-results', 'children'),
-    Output('keyword-input-previous', 'children'),
+    Output('wordcloud-container', 'children'),
     Input('analyze-button', 'n_clicks'),
-    State('keyword-input', 'value'),
-    State('keyword-input-previous', 'children')
+    State('keyword-input', 'value')
 )
-def update_sentiment(n_clicks, keyword, keyword_previous):
-    keyword_previous = keyword_previous or ''  # Set default value if previous state is not defined
-    # Check if button is clicked and keyword input value changes
-    if n_clicks and keyword != keyword_previous:
-        sentiment_results = analyze_sentiment(keyword)
+def update_sentiment_and_wordcloud(n_clicks, keyword):
+    if n_clicks and keyword:  # Check if button is clicked and keyword is provided
+        sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
+        wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64))  # Create image element for word cloud
+        
+        # Return sentiment analysis results and word cloud image
         return (
             html.Div([
                 html.H3(f"Sentiment Analysis Results for '{keyword}'"),
                 html.P(sentiment_results)
             ]),
-            keyword  # Update previous keyword value
+            wordcloud_img
         )
-    return None, keyword_previous
+    return None, None  # Return None if button is not clicked or keyword is not provided
 
 if __name__ == '__main__':
     app.run(debug=False)
