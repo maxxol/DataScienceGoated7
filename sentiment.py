@@ -91,16 +91,12 @@ def analyze_sentiment(datafilterkeyword: str):
     else:
         resultMood = ':|'
 
-    print("--- sentiment for '" + datafilterkeyword + "'---\naverage sentiment value:", averagesentiment, resultMood,
-          "\nmedian sentiment:", mediansentiment, "\nstandard deviation:", standarddeviation,
-          "\n# pos/neu/neg:", totalpositive, "/", totalneutral, "/", totalnegative)
-
     # Unify Text from all weeks
     text = filtered_data['twitter message'].str.cat(sep=' ')
 
     # Set the stopwords list
     stopwords = set(STOPWORDS)
-    new_words = ["feel", "feeling"]
+    new_words = ["feel", "feeling","quot"]
     new_stopwords = stopwords.union(new_words)
 
     # Size of Word Cloud
@@ -121,5 +117,6 @@ def analyze_sentiment(datafilterkeyword: str):
                         f"Median sentiment: {mediansentiment}\n" \
                         f"Standard deviation: {standarddeviation}\n" \
                         f"Number of positive/neutral/negative tweets: {totalpositive}/{totalneutral}/{totalnegative}\n"
+    print(sentiment_results)
                         
     return sentiment_results, wordcloud_base64

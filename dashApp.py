@@ -64,7 +64,6 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
     if n_clicks and keyword:  # Check if button is clicked and keyword is provided
         sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
         wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64))  # Create image element for word cloud
-        
         # Return sentiment analysis results and word cloud image
         return (
             html.Div([
