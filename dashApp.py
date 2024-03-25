@@ -63,16 +63,19 @@ def display_page(pathname):
 def update_sentiment_and_wordcloud(n_clicks, keyword):
     if n_clicks and keyword:  # Check if button is clicked and keyword is provided
         sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
+        sentiment_results_html = html.Pre(sentiment_results) # Convert newline characters to <br> tags within a <pre> tag
         wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64))  # Create image element for word cloud
         # Return sentiment analysis results and word cloud image
         return (
             html.Div([
                 html.H3(f"Sentiment Analysis Results for '{keyword}'"),
-                html.P(sentiment_results)
+                sentiment_results_html
             ]),
             wordcloud_img
         )
-    return None, None  # Return None if button is not clicked or keyword is not provided
+        
+    return None, None 
+
 
 if __name__ == '__main__':
     app.run(debug=False)

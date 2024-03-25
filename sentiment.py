@@ -117,6 +117,6 @@ def analyze_sentiment(datafilterkeyword: str):
                         f"Median sentiment: {mediansentiment}\n" \
                         f"Standard deviation: {standarddeviation}\n" \
                         f"Number of positive/neutral/negative tweets: {totalpositive}/{totalneutral}/{totalnegative}\n"
-    print(sentiment_results)
+    
                         
     return sentiment_results, wordcloud_base64
