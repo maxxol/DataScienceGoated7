@@ -70,8 +70,19 @@ def update_graph(value):
 def update_sentiment_and_wordcloud(n_clicks, keyword):
     if n_clicks and keyword:  # Check if button is clicked and keyword is provided
         sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
-        sentiment_results_html = html.Pre(sentiment_results) # Convert newline characters to <br> tags within a <pre> tag
+        # Define CSS styles based on sentiment score
+        if sentiment_results > 0.5:
+            sentiment_style = {'background-color': 'green', 'padding': '5px'}
+        elif sentiment_results <= 0.5 and sentiment_results >= 0.3:
+            sentiment_style = {'background-color': 'yellow', 'padding': '5px'}
+        else:
+            sentiment_style = {'background-color': 'red', 'padding': '5px'}
+        
+        # Convert newline characters to <br> tags within a <pre> tag
+        sentiment_results_html = html.Pre(sentiment_results, style=sentiment_style)
+        
         wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto'})  # Create image element for word cloud with adjusted size
+        
         # Return sentiment analysis results and word cloud image
         return (
             html.Div([
@@ -81,7 +92,8 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
             wordcloud_img
         )
         
-    return None, None 
+    return None, None
+
 
 
 
