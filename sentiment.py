@@ -24,8 +24,13 @@ def analyze_sentiment(datafilterkeyword: str):
     del df['date']  # delete unused column
     del df['flag']  # delete unused column
 
-    filtered_data = df[df['twitter message'].str.contains(datafilterkeyword)]  # filter data
+    filtered_data = df[df['twitter message'].str.contains(datafilterkeyword.lower())]  # filter data
 
+    if len(filtered_data) == 0:
+        overall_sentiment_score = 0
+        wordcloud_base64 = 0
+        return overall_sentiment_score, wordcloud_base64
+    
     class Mood:
         sentiment: float
 
@@ -75,9 +80,9 @@ def analyze_sentiment(datafilterkeyword: str):
                                                                     totalneutral=totalneutral,
                                                                     totalnegative=totalnegative)
 
-        totalsentiment += mood.sentiment
+        totalsentiment += ((mood.sentiment+1)/2)
         totalsentimentvalues += 1
-        sentimentarray.append(mood.sentiment)
+        sentimentarray.append((mood.sentiment+1)/2)
 
     bubbleSort(sentimentarray)
 
@@ -100,7 +105,7 @@ def analyze_sentiment(datafilterkeyword: str):
     new_stopwords = stopwords.union(new_words)
 
     # Size of Word Cloud
-    plt.rcParams["figure.figsize"] = (7, 4)
+    plt.rcParams["figure.figsize"] = (14, 8)
 
     # Make Wordcloud
     wordcloud = WordCloud(max_font_size=50, max_words=8000, background_color="white", stopwords=new_stopwords,
@@ -111,12 +116,18 @@ def analyze_sentiment(datafilterkeyword: str):
     wordcloud.to_image().save(img, format='PNG')
     wordcloud_base64 = base64.b64encode(img.getvalue()).decode('utf-8')
 
-    # Return sentiment analysis results and word cloud image in base64 format
+    # print sentiment analysis results to console
     sentiment_results = f"Sentiment Analysis Results for '{datafilterkeyword}':\n" \
                         f"Average sentiment value: {averagesentiment} {resultMood}\n" \
                         f"Median sentiment: {mediansentiment}\n" \
                         f"Standard deviation: {standarddeviation}\n" \
                         f"Number of positive/neutral/negative tweets: {totalpositive}/{totalneutral}/{totalnegative}\n"
+    print(sentiment_results)
+    #sentiment_results = 0
     
-                        
-    return sentiment_results, wordcloud_base64
+
+    # Overall sentiment score
+    overall_sentiment_score = ((averagesentiment+mediansentiment-standarddeviation)+1)/5
+
+
+    return overall_sentiment_score, wordcloud_base64
