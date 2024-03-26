@@ -47,11 +47,18 @@ app.layout = html.Div(children=[
 
 # Callback to display page based on URL pathname
 @app.callback(
-    Output('page-content', 'children'),
-    Input('url', 'pathname')
+    Output(component_id='page-content', component_property='children'),
+    Input(component_id='url', component_property='pathname')
 )
 def display_page(pathname):
     return pages.get(pathname, {'content': html.Div(children="404")})['content']
+
+@callback(
+    Output('graph-content', 'figure'),
+    Input('dropdown-selection', 'value'))
+def update_graph(value):
+    dff = df[df.country == value]
+    return px.line(dff, x='year', y='pop')
 
 # Callback to update sentiment results and word cloud
 @app.callback(
@@ -75,6 +82,7 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
         )
         
     return None, None 
+
 
 
 if __name__ == '__main__':
