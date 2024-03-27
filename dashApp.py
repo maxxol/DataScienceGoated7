@@ -71,17 +71,17 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
     if n_clicks and keyword:  # Check if button is clicked and keyword is provided
         sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
         # Define CSS styles based on sentiment score
-        if sentiment_results > 0.5:
-            sentiment_style = {'background-color': 'green', 'padding': '5px'}
-        elif sentiment_results <= 0.5 and sentiment_results >= 0.3:
-            sentiment_style = {'background-color': 'yellow', 'padding': '5px'}
+        if sentiment_results >= 6.5:
+            sentiment_style = {'background-color': 'lime', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+        elif sentiment_results < 6.5 and sentiment_results >= 5.5:
+            sentiment_style = {'background-color': 'yellow', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
         else:
-            sentiment_style = {'background-color': 'red', 'padding': '5px'}
+            sentiment_style = {'background-color': 'red', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
         
         # Convert newline characters to <br> tags within a <pre> tag
-        sentiment_results_html = html.Pre(sentiment_results, style=sentiment_style)
+        sentiment_results_html = html.Div(html.Pre(sentiment_results), style=sentiment_style)
         
-        wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto'})  # Create image element for word cloud with adjusted size
+        wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto','border': '1px solid black','margin': '5px'})  # Create image element for word cloud with adjusted size
         
         # Return sentiment analysis results and word cloud image
         return (
