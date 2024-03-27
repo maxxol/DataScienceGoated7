@@ -17,21 +17,20 @@ app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css',dbc.themes.B
 
 searchBar = html.Div(
     [
-        dbc.Input(id="input", placeholder="Search...", type="text"),
-        html.Br(),
+        dbc.Input(id="input", placeholder="Search...", type="text", style={"width": "75%"}),
         html.P(id="output"),
     ],
-    style={"margin-top": "20px"}
+    style={"flex-grow": "1", "display": "flex", "justify-content": "center", "align-items": "center", "background-color": "#dedede"}
 )
 
 staffImage = html.Div(
     html.Img(src=r'https://placehold.co/280x414', alt='image'),
-    style={"margin-top": "20px"}
+    style={"flex-grow": "3", "display": "flex", "justify-content": "center", "align-items": "center"}
 )
 
 staffBio = html.Div(
     "Bio info you know whats up",
-    style={"margin-top": "20px"}
+    style={"flex-grow": "8", "display": "flex", "justify-content": "center", "background-color": "#dedede"}
 )
 
 
@@ -44,14 +43,15 @@ pageB = html.Div(children=[
                     staffImage,
                     staffBio
                 ],
-                style={'background-color': ''},
+                style={'display': 'flex',  'flex-direction': 'column'},
                 width=4
             ),
             dbc.Col(
-                "aaa",
-                style={'background-color': ''}
+                "",
+                style={'background-color': '#dedede', "margin-left": "12px"}
             ),
-        ]
+        ],
+        style={'height': '100%'}
     ),
 
     # html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
@@ -60,7 +60,9 @@ pageB = html.Div(children=[
     #     dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
     #     html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
     # ])
-])
+    ],
+    style={'height': '100%'}
+)
 
 pageC = dbc.Container(
     [
@@ -108,10 +110,16 @@ app.layout = html.Div(children=[
     html.Div(
         [
             html.Div(className='navbar', children=[html.A(href=path, children=page['name']) for path, page in pages.items()]),
-            html.Div(id='page-content')
-        ]
+            html.Div(
+                id='page-content',
+                style={"flex-grow": "1", "margin-top": "24px"}
+            )
+        ],
+        style={'height': '100%', "width": "100%", "display": "flex", "flex-direction": "column"}
     )
-])
+],
+style={'height': '100%', "width": "100%", "display": "flex"}
+)
 
 # Callback to display page based on URL pathname
 @app.callback(

@@ -1,3 +1,7 @@
+html,body,div#react-entry-point {
+    height: 100%;
+}
+
 .navbar {
     background-color: #fff;
     border-radius: 0;
