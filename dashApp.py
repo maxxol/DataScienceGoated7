@@ -9,18 +9,57 @@ import dash_bootstrap_components as dbc
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
-dbengine = create_engine('postgresql://postgres:root@localhost/postgres')
+dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css',dbc.themes.BOOTSTRAP])
 
+
+searchBar = html.Div(
+    [
+        dbc.Input(id="input", placeholder="Search...", type="text"),
+        html.Br(),
+        html.P(id="output"),
+    ],
+    style={"margin-top": "20px"}
+)
+
+staffImage = html.Div(
+    html.Img(src=r'https://placehold.co/280x414', alt='image'),
+    style={"margin-top": "20px"}
+)
+
+staffBio = html.Div(
+    "Bio info you know whats up",
+    style={"margin-top": "20px"}
+)
+
+
 pageB = html.Div(children=[
-    html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
-    dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
-    html.Div(id='output-container', style={'display': 'flex'}, children=[
-        dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
-        html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
-    ])
+    dbc.Row(
+        [
+            dbc.Col(
+                [
+                    searchBar,
+                    staffImage,
+                    staffBio
+                ],
+                style={'background-color': ''},
+                width=4
+            ),
+            dbc.Col(
+                "aaa",
+                style={'background-color': ''}
+            ),
+        ]
+    ),
+
+    # html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
+    # dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
+    # html.Div(id='output-container', style={'display': 'flex'}, children=[
+    #     dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
+    #     html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
+    # ])
 ])
 
 pageC = dbc.Container(
@@ -66,8 +105,12 @@ pages = {
 # Define app layout
 app.layout = html.Div(children=[
     dcc.Location(id='url'),
-    html.Div(className='navbar', children=[html.A(href=path, children=page['name']) for path, page in pages.items()]),
-    html.Div(id='page-content')
+    html.Div(
+        [
+            html.Div(className='navbar', children=[html.A(href=path, children=page['name']) for path, page in pages.items()]),
+            html.Div(id='page-content')
+        ]
+    )
 ])
 
 # Callback to display page based on URL pathname
