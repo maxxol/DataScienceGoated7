@@ -3,14 +3,16 @@ from dash import Dash, html, dcc, callback, Output, Input, State, dash_table
 import plotly.express as px
 import pandas as pd
 from sqlalchemy import create_engine
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
-#the line 10,11 and 20 are commented out due to postgres issues on Jeroen's end while making this merging the sentiment and dashapp parts. 
 dbengine = create_engine('postgresql://postgres:root@localhost/postgres')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
-app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css'])
+app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css',dbc.themes.BOOTSTRAP])
 
 pageB = html.Div(children=[
     html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
@@ -21,15 +23,38 @@ pageB = html.Div(children=[
     ])
 ])
 
-pageC = html.Div(children=[
-    html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
-    html.Div([
-        dcc.Input(id='keyword-input', type='text', placeholder='Enter keyword'),
-        html.Button('Analyze Sentiment', id='analyze-button', n_clicks=0)
-    ]),
-    html.Div(id='sentiment-results'),  # Placeholder for sentiment analysis results
-    html.Div(id='wordcloud-container')  # Placeholder for word cloud image
-])
+pageC = dbc.Container(
+    [
+        dbc.Row(
+            [
+                html.H1(children='Title of Dash App', style={'textAlign': 'center'})
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(html.Div("row1 col1", style={'border': '1px solid black', 'padding': '10px'}), width=4),
+                dbc.Col(html.Div("row1 col2", style={'border': '1px solid black', 'padding': '10px'}), width=4),
+                dbc.Col(html.Div("row1 col3", style={'border': '1px solid black', 'padding': '10px'}), width=4),
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(html.Div("row2 col1", style={'border': '1px solid black', 'padding': '10px'}), width=4),
+                dbc.Col(html.Div([
+                    html.Div([
+                        dcc.Input(id='keyword-input', type='text', placeholder='Enter keyword'),
+                        html.Button('Analyze Sentiment', id='analyze-button', n_clicks=0)
+                    ]),
+                    html.Div(id='sentiment-results'),  # Placeholder for sentiment analysis results
+                    html.Div(id='wordcloud-container')  # Placeholder for word cloud image
+                ]), width=8, style={'border': '1px solid black', 'padding': '10px'}),
+                
+            ]
+        )
+    ],
+    fluid=True
+)
+
 
 pages = {
     '/': {'name': 'Home', 'content': html.Div(children="Dit is de homepagina")},
