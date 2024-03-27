@@ -63,7 +63,6 @@ def analyze_sentiment(datafilterkeyword: str):
     # Initiating variables
     resultMood = ''
     totalsentiment = 0
-    totalsentimentvalues = 0
     averagesentiment = 0
     mediansentiment = 0
     sentimentarray = []
@@ -81,20 +80,13 @@ def analyze_sentiment(datafilterkeyword: str):
                                                                     totalnegative=totalnegative)
 
         totalsentiment += ((mood.sentiment+1)/2)
-        totalsentimentvalues += 1
         sentimentarray.append((mood.sentiment+1)/2)
 
     bubbleSort(sentimentarray)
 
     mediansentiment = round(sentimentarray[math.floor(len(sentimentarray) / 2)], 3)
-    averagesentiment = round(totalsentiment / totalsentimentvalues, 3)
+    averagesentiment = round(totalsentiment / len(sentimentarray), 3)
     standarddeviation = round(np.std(sentimentarray), 3)
-    if averagesentiment >= threshold:
-        resultMood = ':D'
-    elif averagesentiment <= -threshold:
-        resultMood = '>:('
-    else:
-        resultMood = ':|'
 
     # Unify Text from all weeks
     text = filtered_data['twitter message'].str.cat(sep=' ')
@@ -105,7 +97,7 @@ def analyze_sentiment(datafilterkeyword: str):
     new_stopwords = stopwords.union(new_words)
 
     # Size of Word Cloud
-    plt.rcParams["figure.figsize"] = (14, 8)
+    plt.rcParams["figure.figsize"] = (140, 80)
 
     # Make Wordcloud
     wordcloud = WordCloud(max_font_size=50, max_words=8000, background_color="white", stopwords=new_stopwords,
@@ -118,7 +110,7 @@ def analyze_sentiment(datafilterkeyword: str):
 
     # print sentiment analysis results to console
     sentiment_results = f"Sentiment Analysis Results for '{datafilterkeyword}':\n" \
-                        f"Average sentiment value: {averagesentiment} {resultMood}\n" \
+                        f"Average sentiment value: {averagesentiment} \n" \
                         f"Median sentiment: {mediansentiment}\n" \
                         f"Standard deviation: {standarddeviation}\n" \
                         f"Number of positive/neutral/negative tweets: {totalpositive}/{totalneutral}/{totalnegative}\n"
@@ -127,7 +119,7 @@ def analyze_sentiment(datafilterkeyword: str):
     
 
     # Overall sentiment score
-    overall_sentiment_score = ((averagesentiment+mediansentiment-standarddeviation)+1)/5
+    overall_sentiment_score = round(((((averagesentiment+mediansentiment-standarddeviation)+1)/3)*10),3)
 
 
     return overall_sentiment_score, wordcloud_base64

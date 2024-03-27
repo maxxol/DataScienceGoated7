@@ -7,8 +7,8 @@ df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapmi
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
 #the line 10,11 and 20 are commented out due to postgres issues on Jeroen's end while making this merging the sentiment and dashapp parts. 
-#dbengine = create_engine('postgresql://postgres:root@localhost/test')
-#dt = pd.read_sql('SELECT * FROM stuff.stuff', dbengine)
+dbengine = create_engine('postgresql://postgres:root@localhost/postgres')
+dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css'])
 
@@ -17,7 +17,7 @@ pageB = html.Div(children=[
     dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
     html.Div(id='output-container', style={'display': 'flex'}, children=[
         dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
-        #html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
+        html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
     ])
 ])
 
@@ -70,8 +70,19 @@ def update_graph(value):
 def update_sentiment_and_wordcloud(n_clicks, keyword):
     if n_clicks and keyword:  # Check if button is clicked and keyword is provided
         sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
-        sentiment_results_html = html.Pre(sentiment_results) # Convert newline characters to <br> tags within a <pre> tag
-        wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto'})  # Create image element for word cloud with adjusted size
+        # Define CSS styles based on sentiment score
+        if sentiment_results >= 6.5:
+            sentiment_style = {'background-color': 'lime', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+        elif sentiment_results < 6.5 and sentiment_results >= 5.5:
+            sentiment_style = {'background-color': 'yellow', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+        else:
+            sentiment_style = {'background-color': 'red', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+        
+        # Convert newline characters to <br> tags within a <pre> tag
+        sentiment_results_html = html.Div(html.Pre(sentiment_results), style=sentiment_style)
+        
+        wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto','border': '1px solid black','margin': '5px'})  # Create image element for word cloud with adjusted size
+        
         # Return sentiment analysis results and word cloud image
         return (
             html.Div([
@@ -81,7 +92,8 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
             wordcloud_img
         )
         
-    return None, None 
+    return None, None
+
 
 
 
