@@ -3,14 +3,13 @@ from dash import Dash, html, dcc, callback, Output, Input, State, dash_table
 import plotly.express as px
 import pandas as pd
 from sqlalchemy import create_engine
-import dash_core_components as dcc
-import dash_html_components as html
+
 import dash_bootstrap_components as dbc
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
-dbengine = create_engine('postgresql://postgres:root@localhost/postgres')
-dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
+dbengine = create_engine('postgresql://postgres:root@localhost/IMDB')
+dt = pd.read_sql('SELECT * FROM title WHERE primarytitle = \'Top Gun\'', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css',dbc.themes.BOOTSTRAP])
 
@@ -124,3 +123,5 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
 
 if __name__ == '__main__':
     app.run(debug=False)
+
+#%%
