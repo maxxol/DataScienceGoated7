@@ -119,7 +119,7 @@ def analyze_sentiment(datafilterkeyword: str):
     
 
     # Overall sentiment score
-    overall_sentiment_score = round((((averagesentiment+mediansentiment-standarddeviation)+1)/3),3)*10
+    overall_sentiment_score = round(((((averagesentiment+mediansentiment-standarddeviation)+1)/3)*10),3)
 
 
     return overall_sentiment_score, wordcloud_base64
