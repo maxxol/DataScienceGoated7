@@ -1,0 +1,46 @@
+.container-genre {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+.container-genre .container-genre-top {
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+}
+.container-genre .container-genre-top .dropdown {
+  width: 30%;
+  background-color: #dedede;
+}
+.container-genre .container-genre-top .header {
+  width: 70%;
+  background-color: #dedede;
+}
+.container-genre .container-genre-bottom {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.container-genre .container-genre-bottom .sub-container {
+  min-width: 20%;
+  max-width: 45%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  background-color: #dedede;
+}
+.container-genre .container-genre-bottom .sub-container h1 {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
+/*# sourceMappingURL=genrePage.css.map */

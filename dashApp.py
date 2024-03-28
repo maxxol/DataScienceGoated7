@@ -12,7 +12,67 @@ from sentiment import analyze_sentiment  # Import the sentiment analysis method
 dbengine = create_engine('postgresql://postgres:1234@localhost/imdb')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
-app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css','./assets/staffPage.css'])
+app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css','./assets/staffPage.css','./assets/genrePage.css'])
+
+dropdown = html.Div(className="dropdown")
+genreHeader = html.Div(className="header")
+
+genreTopBar = html.Div(
+    [
+        dropdown,
+        genreHeader,
+    ],
+    className="container-genre-top"
+)
+
+casting = html.Div([
+    html.H1("Casting"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    ],
+    className="sub-container casting"
+)
+
+boxOffice = html.Div([
+    html.H1("Box Office"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    ],
+    className="sub-container box-office"
+)
+
+technical = html.Div([
+    html.H1("Technische uhh"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    ],
+    className="sub-container technical"
+)
+
+history = html.Div([
+    html.H1("Historie"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    ],
+    className="sub-container history"
+)
+
+genreContent = html.Div(
+    [
+        casting,
+        boxOffice,
+        technical,
+        history,
+    ],
+    className="container-genre-bottom"
+)
+
+pageA = html.Div(
+    [
+        genreTopBar,
+        genreContent,
+    ],
+    className="container-genre",
+)
 
 
 searchBar = html.Div(
@@ -125,7 +185,7 @@ pageC = dbc.Container(
 
 pages = {
     '/': {'name': 'Home', 'content': html.Div(children="Dit is de homepagina")},
-    '/page1': {'name': 'PageA', 'content': html.Div(children="Dit is pagina A")},
+    '/page1': {'name': 'PageA', 'content': pageA},
     '/page2': {'name': 'PageB', 'content': pageB},
     '/page3': {'name': 'PageC', 'content': pageC},
 }
