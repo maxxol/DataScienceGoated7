@@ -3,66 +3,92 @@ from dash import Dash, html, dcc, callback, Output, Input, State, dash_table
 import plotly.express as px
 import pandas as pd
 from sqlalchemy import create_engine
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc as dcc
+from dash import html as html
 import dash_bootstrap_components as dbc
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
-dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
+dbengine = create_engine('postgresql://postgres:1234@localhost/imdb')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
-app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css',dbc.themes.BOOTSTRAP])
+app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css','./assets/staffPage.css'])
 
 
 searchBar = html.Div(
     [
-        dbc.Input(id="input", placeholder="Search...", type="text", style={"width": "75%"}),
+        dcc.Input(id="input", placeholder="Search...", type="text", className="search-bar"),
         html.P(id="output"),
     ],
-    style={"flex-grow": "1", "display": "flex", "justify-content": "center", "align-items": "center", "background-color": "#dedede"}
+    className="search-bar-container"
 )
 
 staffImage = html.Div(
-    html.Img(src=r'https://placehold.co/280x414', alt='image'),
-    style={"flex-grow": "3", "display": "flex", "justify-content": "center", "align-items": "center"}
+    html.Img(src=r'https://placehold.co/280x414', alt='image', className="image"),
+    className="container-image",
 )
 
 staffBio = html.Div(
     "Bio info you know whats up",
-    style={"flex-grow": "8", "display": "flex", "justify-content": "center", "background-color": "#dedede"}
+    className="container-bio",
 )
 
+header = html.H1(
+    "Acteur Naam (of zo?)",
+    className="header",
+)
 
-pageB = html.Div(children=[
-    dbc.Row(
-        [
-            dbc.Col(
-                [
-                    searchBar,
-                    staffImage,
-                    staffBio
-                ],
-                style={'display': 'flex',  'flex-direction': 'column'},
-                width=4
-            ),
-            dbc.Col(
-                "",
-                style={'background-color': '#dedede', "margin-left": "12px"}
-            ),
-        ],
-        style={'height': '100%'}
-    ),
+graph1 = html.Div(
+    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    className="graph-pi",
+)
 
-    # html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
-    # dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
-    # html.Div(id='output-container', style={'display': 'flex'}, children=[
-    #     dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
-    #     html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
-    # ])
+graph2 = html.Div(
+    html.Img(src=r'https://placehold.co/750x400', alt='image', className="image"),
+    className="graph-bar",
+)
+
+graphContainer = html.Div(
+    [
+        graph1,
+        graph2,
     ],
-    style={'height': '100%'}
+    className="container-graph",
 )
+
+sentimentContainer = html.Div(
+    "",
+    className="container-sentiment",
+)
+
+
+pageB = html.Div([
+        html.Div(
+            [
+                searchBar,
+                staffImage,
+                staffBio
+            ],
+            className="container-staff-left",
+        ),
+        html.Div(
+            [
+                header,
+                graphContainer,
+                sentimentContainer,
+            ],
+            className="container-staff-right",
+        ),
+    ],
+    className="container-staff"
+),
+
+# html.H1(children='Title of Dash App', style={'textAlign': 'center'}),
+# dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
+# html.Div(id='output-container', style={'display': 'flex'}, children=[
+#     dcc.Graph(id='graph-content', style={'width': '50%', 'height': '500px'}),
+#     html.Div(children=[dash_table.DataTable(dt.to_dict('records'), page_size=300)], style={'width': '50%'}),
+# ])
 
 pageC = dbc.Container(
     [

@@ -1,9 +1,10 @@
 html,body,div#react-entry-point {
+    margin: 0;
     height: 100%;
 }
 
 .navbar {
-    background-color: #fff;
+    background-color: #dedede;
     border-radius: 0;
     margin-bottom: 0;
     padding: 0;
