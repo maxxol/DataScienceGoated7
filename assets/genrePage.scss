@@ -13,9 +13,16 @@
     flex-direction: row;
     gap: 24px;
 
-    .dropdown {
+    .container-dropdown {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 30%;
       background-color: #dedede;
+
+      #select-genre {
+        width: 75%;
+      }
     }
 
     .header {

@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, callback, Output, Input, State, dash_table
+from dash import Dash, html, dcc, callback, Output, Input, State, dash_table, ALL
 
 import plotly.express as px
 import pandas as pd
@@ -9,12 +9,15 @@ import dash_bootstrap_components as dbc
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
-dbengine = create_engine('postgresql://postgres:1234@localhost/imdb')
+dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
-app = Dash("MovieDash", external_stylesheets=['./assets/navbar.css','./assets/staffPage.css','./assets/genrePage.css'])
+app = Dash("MovieDash", external_stylesheets=['./assets/global.css','./assets/staffPage.css','./assets/genrePage.css'])
 
-dropdown = html.Div(className="dropdown")
+dropdown = html.Div(className="container-dropdown", children=[
+    dcc.Dropdown(["Action", "Western", "Fantasy", "Romcom", "Sci-fi"], clearable=True, id="select-genre")
+])
+
 genreHeader = html.Div(className="header")
 
 genreTopBar = html.Div(
@@ -195,7 +198,8 @@ app.layout = html.Div(children=[
     dcc.Location(id='url'),
     html.Div(
         [
-            html.Div(className='navbar', children=[html.A(href=path, children=page['name']) for path, page in pages.items()]),
+            html.Div(id='navbar', className='navbar', children=[html.A(href=path, children=page['name'], id={"type":"link-navbar",
+                "index": "/" if path == 0 else f"{path}"}) for path, page in pages.items()]),
             html.Div(
                 id='page-content',
                 style={"flex-grow": "1", "margin-top": "24px"}
@@ -214,6 +218,13 @@ style={'height': '100%', "width": "100%", "display": "flex"}
 )
 def display_page(pathname):
     return pages.get(pathname, {'content': html.Div(children="404")})['content']
+
+
+@app.callback(Output({"type":"link-navbar", "index":ALL}, "className"),
+[Input("url", "pathname"),Input({"type":"link-navbar", "index":ALL}, "id")])
+def callback_func(pathname, link_elements):
+    return ["active" if link["index"] == pathname else "" for link in link_elements]
+
 
 @callback(
     Output('graph-content', 'figure'),
