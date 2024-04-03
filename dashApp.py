@@ -1,6 +1,7 @@
 from dash import Dash, html, dcc, callback, Output, Input, State, dash_table, ALL
 
 import plotly.express as px
+import plotly.graph_objs as go
 import pandas as pd
 from sqlalchemy import create_engine
 from dash import dcc as dcc
@@ -9,13 +10,54 @@ import dash_bootstrap_components as dbc
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
+from graph_callbacks import *
+
 dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/global.css','./assets/staffPage.css','./assets/genrePage.css'])
 
+callback_rating_vs_runtime(app, dbengine)
+callback_top_genre_pairs(app, dbengine)
+callback_top_gross_movies(app, dbengine)
+callback_bottom_gross_movies(app, dbengine)
+callback_historical_popularity(app, dbengine)
+callback_popular_actors(app, dbengine)
+callback_popular_directors(app, dbengine)
+
+genre_options = [
+    {"label": "Action", "value": "Action"},
+    # {"label": "Adult", "value": "Adult"},
+    {"label": "Adventure", "value": "Adventure"},
+    {"label": "Animation", "value": "Animation"},
+    {"label": "Biography", "value": "Biography"},
+    {"label": "Comedy", "value": "Comedy"},
+    {"label": "Crime", "value": "Crime"},
+    # {"label": "Documentary", "value": "Documentary"},
+    {"label": "Drama", "value": "Drama"},
+    {"label": "Family", "value": "Family"},
+    {"label": "Fantasy", "value": "Fantasy"},
+    {"label": "Film-Noir", "value": "Film-Noir"},
+    # {"label": "Game-Show", "value": "Game-Show"},
+    {"label": "History", "value": "History"},
+    {"label": "Horror", "value": "Horror"},
+    {"label": "Music", "value": "Music"},
+    {"label": "Musical", "value": "Musical"},
+    {"label": "Mystery", "value": "Mystery"},
+    # {"label": "News", "value": "News"},
+    # {"label": "Reality-TV", "value": "Reality-TV"},
+    {"label": "Romance", "value": "Romance"},
+    {"label": "Sci-Fi", "value": "Sci-Fi"},
+    # {"label": "Short", "value": "Short"},
+    {"label": "Sport", "value": "Sport"},
+    # {"label": "Talk-Show", "value": "Talk-Show"},
+    {"label": "Thriller", "value": "Thriller"},
+    {"label": "War", "value": "War"},
+    {"label": "Western", "value": "Western"}
+]
+
 dropdown = html.Div(className="container-dropdown", children=[
-    dcc.Dropdown(["Action", "Western", "Fantasy", "Romcom", "Sci-fi"], clearable=True, id="select-genre")
+    dcc.Dropdown(options=genre_options, clearable=True, id="select-genre")
 ])
 
 genreHeader = html.Div(className="header")
@@ -28,36 +70,38 @@ genreTopBar = html.Div(
     className="container-genre-top"
 )
 
+
 casting = html.Div([
     html.H1("Casting"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.Div(id='graph-popular-actors', className="graph"),
+    html.Div(id='graph-popular-directors', className="graph"),
     ],
     className="sub-container casting"
 )
 
 boxOffice = html.Div([
     html.H1("Box Office"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.Div(id='graph-top-gross-movies', className="graph"),
+    html.Div(id='graph-bottom-gross-movies', className="graph"),
     ],
     className="sub-container box-office"
 )
 
 technical = html.Div([
-    html.H1("Technische uhh"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.H1("Technical"),
+    html.Div(id='graph-rating-vs-runtime', className="graph"),
+    html.Div(id='graph-top-genre-pairs', className="graph"),
     ],
     className="sub-container technical"
 )
 
 history = html.Div([
-    html.H1("Historie"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.H1("History"),
+    html.Div(id='graph-historical-popularity', className="graph"),
     ],
     className="sub-container history"
 )
+
 
 genreContent = html.Div(
     [

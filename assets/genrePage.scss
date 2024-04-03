@@ -1,16 +1,17 @@
+@import "variables";
+
 .container-genre {
   height: 100%;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   gap: 24px;
 
   .container-genre-top {
-    height: 10%;
 
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 24px;
 
     .container-dropdown {
@@ -18,7 +19,14 @@
       justify-content: center;
       align-items: center;
       width: 30%;
+      height: 75px;
+      flex: 1;
       background-color: #dedede;
+
+      @media screen and (max-width: $smallest_screen) {
+        min-width: 60%;
+        height: 40px;
+      }
 
       #select-genre {
         width: 75%;
@@ -27,7 +35,14 @@
 
     .header {
       width: 70%;
+      height: 75px;
+      flex: 2;
       background-color: #dedede;
+
+      @media screen and (max-width: $smallest_screen) {
+        min-width: 60%;
+        height: 40px;
+      }
     }
   }
 
@@ -48,14 +63,27 @@
         text-align: center;
       }
 
-      min-width: 20%;
-      max-width: 45%;
+      .graph {
+        width: 100%;
+      }
+
+      padding: 24px 85px;
+      flex: 1; // This combined with min-width 35% will make it scale to 50%
+      min-width: 35%; // cuz it needs 33.3% or lower to fit 3 in the same row
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
+      gap: 24px;
+      flex-direction: column;
+      align-items: center;
 
       background-color: #dedede;
+
+      @media screen and (max-width: $minimum_graph_width * 2) {
+        min-width: 60%;
+      }
+
+      @media screen and (max-width: $small_screen) {
+        padding: 0;
+      }
     }
   }
 }
