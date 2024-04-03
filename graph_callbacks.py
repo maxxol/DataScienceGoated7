@@ -331,3 +331,79 @@ def callback_popular_directors(app, dbengine):
         )
         fig = go.Figure(data=[scatter], layout=layout)
         return dcc.Graph(figure=fig)
+
+
+def callback_genres_by_actor(app, dbengine):
+    @app.callback(
+        Output('grafiek8content', 'children'),
+        [Input('actor-input-box', 'value')]
+    )
+    def update_graph8(selected_actor):
+        #SQL query with selected genre filter
+        query = f"""
+        SELECT 
+        person.person_id, 
+        person.primary_name AS name, 
+        genre.genre_name AS genre,
+        COUNT(DISTINCT rating.title_id) AS film_count
+        FROM rating 
+        JOIN has_genre ON rating.title_id = has_genre.title_id
+        JOIN genre  ON has_genre.genre_id = genre.genre_id
+        JOIN works_on ON rating.title_id = works_on.title_id
+        JOIN person ON works_on.person_id = person.person_id
+        WHERE person.primary_name = '{selected_actor}'
+        GROUP BY person.person_id, person.primary_name, genre
+        ORDER BY film_count DESC;
+        """
+
+        tabel = pd.read_sql(query, dbengine)
+
+        #create a pie chart
+        pie_chart = go.Pie(
+        labels=tabel['genre'],
+        values=tabel['film_count'],
+        marker=dict(colors=['blue', 'cyan' ,'lime', 'green', 'yellow', 'orange', 'red', 'pink', 'purple'] * len(tabel))  # R A I N B O W
+    )
+
+
+        layout = go.Layout(
+            title=f'Film distribution by Genre for {selected_actor}',
+        )
+
+        fig = go.Figure(data=[pie_chart], layout=layout)
+
+        return dcc.Graph(figure=fig)
+
+
+def callback_most_grossing_by_actor(app, dbengine):
+    @app.callback(
+        Output('grafiek9content', 'children'),
+        [Input('actor-input-box', 'value')]
+    )
+    def update_graph9(selected_actor):
+        # SQL query with selected genre filter
+        query = f"""
+        SELECT t.primary_title as film, ROUND(AVG(f.revenue)) as revenue
+        FROM title t
+        JOIN finance f ON t.title_id = f.title_id
+        JOIN works_on ON t.title_id = works_on.title_id
+        JOIN person ON works_on.person_id = person.person_id
+        WHERE person.primary_name = '{selected_actor}'
+        and revenue is not null
+        group by t.primary_title
+        ORDER BY revenue desc
+        LIMIT 10
+        """
+        tabel = pd.read_sql(query, dbengine)
+
+        # create a Dash DataTable component to display the query result
+        table = dash_table.DataTable(
+            id='table',
+            columns=[{"name": i, "id": i} for i in tabel.columns],
+            data=tabel.to_dict('records'),
+            style_table={'overflowX': 'scroll'},
+            style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
+            style_data={'whiteSpace': 'normal', 'height': 'auto'}
+        )
+
+        return table
