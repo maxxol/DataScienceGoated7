@@ -46,6 +46,7 @@
   background-color: #dedede;
 }
 .container-staff .container-staff-left .container-image .image {
+  height: 100%;
   max-width: 100%;
   max-height: 100%;
   border: black dotted 1px;
@@ -75,9 +76,26 @@
 .container-staff .container-staff-right .container-graph {
   height: 60%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: center;
   background-color: #dedede;
+}
+.container-staff .container-staff-right .container-graph .graph-pi {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 25%;
+}
+.container-staff .container-staff-right .container-graph .graph-table {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 50%;
+}
+.container-staff .container-staff-right .container-graph .graph-table #graph-grossing-by-actor {
+  width: 100%;
 }
 .container-staff .container-staff-right .container-graph .image {
   border: black dotted 1px;

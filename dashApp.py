@@ -24,6 +24,8 @@ callback_bottom_gross_movies(app, dbengine)
 callback_historical_popularity(app, dbengine)
 callback_popular_actors(app, dbengine)
 callback_popular_directors(app, dbengine)
+callback_genres_by_actor(app, dbengine)
+callback_most_grossing_by_actor(app, dbengine)
 
 genre_options = [
     {"label": "Action", "value": "Action"},
@@ -124,14 +126,16 @@ pageA = html.Div(
 
 searchBar = html.Div(
     [
-        dcc.Input(id="input", placeholder="Search...", type="text", className="search-bar"),
-        html.P(id="output"),
+        dcc.Input(id="actor-input-box", placeholder="Search...", type="text", className="search-bar"),
+        dcc.Store(id="actor-input-store"),
+        dcc.Store(id="actor-id-store"),
     ],
     className="search-bar-container"
 )
 
 staffImage = html.Div(
     html.Img(src=r'https://placehold.co/280x414', alt='image', className="image"),
+    id="actor-image",
     className="container-image",
 )
 
@@ -142,17 +146,18 @@ staffBio = html.Div(
 
 header = html.H1(
     "Acteur Naam (of zo?)",
+    id="actor-header",
     className="header",
 )
 
 graph1 = html.Div(
-    html.Img(src=r'https://placehold.co/400x400', alt='image', className="image"),
+    html.Div(id='graph-genres-by-actor', className="graph"),
     className="graph-pi",
 )
 
 graph2 = html.Div(
-    html.Img(src=r'https://placehold.co/750x400', alt='image', className="image"),
-    className="graph-bar",
+    html.Div(id='graph-grossing-by-actor', className="graph"),
+    className="graph-table",
 )
 
 graphContainer = html.Div(
@@ -166,6 +171,7 @@ graphContainer = html.Div(
 sentimentContainer = html.Div(
     "",
     className="container-sentiment",
+
 )
 
 

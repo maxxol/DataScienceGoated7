@@ -1,5 +1,8 @@
-from dash import Output, Input
+import requests
+from bs4 import BeautifulSoup
+from dash import Output, Input, dash_table, html
 
+import plotly.express as px
 import plotly.graph_objs as go
 import pandas as pd
 from dash import dcc as dcc
@@ -30,7 +33,10 @@ def callback_rating_vs_runtime(app, dbengine):
                                   name='Rating vs Runtime'))
         fig.update_layout(title='Rating vs Runtime',
                           xaxis_title='Runtime (minutes)',
-                          yaxis_title='Average Rating')
+                          yaxis_title='Average Rating',
+                          paper_bgcolor='rgba(0,0,0,0)',
+                          plot_bgcolor='rgba(0,0,0,0)',
+                          )
         fig.update_xaxes(range=[0, 200])  # Set the y-axis upper bound to 30
 
         return dcc.Graph(figure=fig)
@@ -87,7 +93,9 @@ def callback_top_genre_pairs(app, dbengine):
         layout = go.Layout(
             title=f'Top 5 genre Paired with {selected_genre}',
             xaxis=dict(title='Genre'),
-            yaxis=dict(title='Frequency')
+            yaxis=dict(title='Frequency'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
@@ -128,7 +136,9 @@ def callback_top_gross_movies(app, dbengine):
         layout = go.Layout(
             title=f'Top 10 earning film with genre:  {selected_genre}',
             xaxis=dict(title='Genre'),
-            yaxis=dict(title='earnings')
+            yaxis=dict(title='earnings'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
@@ -169,7 +179,9 @@ def callback_bottom_gross_movies(app, dbengine):
         layout = go.Layout(
             title=f'Bottom 10 earning film with genre:  {selected_genre}',
             xaxis=dict(title='Genre'),
-            yaxis=dict(title='earnings')
+            yaxis=dict(title='earnings'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
@@ -204,7 +216,9 @@ def callback_historical_popularity(app, dbengine):
         layout = go.Layout(
             title=f'Historical popularity:  {selected_genre}',
             xaxis=dict(title='year', range=[1950, 2026]),
-            yaxis=dict(title='films made')
+            yaxis=dict(title='films made'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
 
         fig = go.Figure(data=[line_chart], layout=layout)
@@ -267,7 +281,9 @@ def callback_popular_actors(app, dbengine):
         layout = go.Layout(
             title=f'Popular Genre actors:  {selected_genre}',
             xaxis=dict(title='Average box office', range=[0, max(tabel['revenue'])]),
-            yaxis=dict(title='Average Rating', range=[0, 10])
+            yaxis=dict(title='Average Rating', range=[0, 10]),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
         fig = go.Figure(data=[scatter], layout=layout)
         return dcc.Graph(figure=fig)
@@ -327,7 +343,9 @@ def callback_popular_directors(app, dbengine):
         layout = go.Layout(
             title=f'Popular Genre Directors:  {selected_genre}',
             xaxis=dict(title='Average box office', range=[0, max(tabel['revenue'])]),
-            yaxis=dict(title='Average Rating', range=[0, 10])
+            yaxis=dict(title='Average Rating', range=[0, 10]),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
         fig = go.Figure(data=[scatter], layout=layout)
         return dcc.Graph(figure=fig)
@@ -335,7 +353,8 @@ def callback_popular_directors(app, dbengine):
 
 def callback_genres_by_actor(app, dbengine):
     @app.callback(
-        Output('grafiek8content', 'children'),
+        Output('graph-genres-by-actor', 'children'),
+        Output("actor-input-store", "data"),
         [Input('actor-input-box', 'value')]
     )
     def update_graph8(selected_actor):
@@ -356,7 +375,14 @@ def callback_genres_by_actor(app, dbengine):
         ORDER BY film_count DESC;
         """
 
-        tabel = pd.read_sql(query, dbengine)
+        # Originele code
+        # tabel = pd.read_sql(query, dbengine)
+        tabel = pd.read_sql(query, dbengine).head(8) # Aangepast om alleen de eerste 8 te pakken
+
+        person_id = tabel['person_id'].values[0]
+        person_name = tabel['name'].values[0]
+        #print(person_id)
+        #print(person_name)
 
         #create a pie chart
         pie_chart = go.Pie(
@@ -365,19 +391,51 @@ def callback_genres_by_actor(app, dbengine):
         marker=dict(colors=['blue', 'cyan' ,'lime', 'green', 'yellow', 'orange', 'red', 'pink', 'purple'] * len(tabel))  # R A I N B O W
     )
 
-
         layout = go.Layout(
             title=f'Film distribution by Genre for {selected_actor}',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
         )
 
         fig = go.Figure(data=[pie_chart], layout=layout)
 
-        return dcc.Graph(figure=fig)
+        return dcc.Graph(figure=fig), {'actor_id': person_id, 'actor_name': person_name}
+
+    @app.callback(
+        Output("actor-header", "children"),
+        Output("actor-id-store", "data"),
+        Input("actor-input-store", "data")
+    )
+    def update_header(data):
+        return data['actor_name'], {'actor_id': data['actor_id']}
+
+    @app.callback(
+        Output("actor-image", "children"),
+        Input("actor-id-store", "data"),
+    )
+    def update_image(data):
+        headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36'}
+
+        actor_id = data['actor_id']
+        url = f'https://www.imdb.com/name/{actor_id}/'
+        print(url)
+
+        result = requests.get(url, headers=headers)
+
+        soup = BeautifulSoup(result.text, 'html.parser')
+
+        try:
+            container_div = soup.find("div", attrs={'class': "ipc-poster"})
+            image = container_div.find("img")
+            return html.Img(src=image["src"], alt='image', className="image"),
+
+        except:
+            print("oeps")
 
 
 def callback_most_grossing_by_actor(app, dbengine):
     @app.callback(
-        Output('grafiek9content', 'children'),
+        Output('graph-grossing-by-actor', 'children'),
         [Input('actor-input-box', 'value')]
     )
     def update_graph9(selected_actor):
