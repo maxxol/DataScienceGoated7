@@ -25,7 +25,8 @@ callback_historical_popularity(app, dbengine)
 callback_popular_actors(app, dbengine)
 callback_popular_directors(app, dbengine)
 callback_genres_by_actor(app, dbengine)
-callback_most_grossing_by_actor(app, dbengine)
+# callback_most_grossing_by_actor(app, dbengine) functie bestaat niet meer
+callback_search_for_staff(app, dbengine)
 
 genre_options = [
     {"label": "Action", "value": "Action"},
@@ -126,8 +127,14 @@ pageA = html.Div(
 
 searchBar = html.Div(
     [
-        dcc.Input(id="actor-input-box", placeholder="Search...", type="text", className="search-bar"),
-        dcc.Store(id="actor-input-store"),
+        html.Div([
+            html.Div([
+
+            ], id="actor-search-results", className="results-container"),
+            dcc.Input(id="actor-search-input", placeholder="Search...", type="text", className="search-bar"),
+        ], className="container-container"),
+
+        html.Button(id="actor-search-button", children="Find Actors", className=""),
         dcc.Store(id="actor-id-store"),
     ],
     className="search-bar-container"

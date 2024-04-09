@@ -1,11 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from dash import Output, Input, dash_table, html
+from dash import Output, Input, dash_table, html, State, ALL
 
 import plotly.express as px
 import plotly.graph_objs as go
 import pandas as pd
 from dash import dcc as dcc
+from dash.exceptions import PreventUpdate
 
 
 def callback_rating_vs_runtime(app, dbengine):
@@ -354,10 +355,15 @@ def callback_popular_directors(app, dbengine):
 def callback_genres_by_actor(app, dbengine):
     @app.callback(
         Output('graph-genres-by-actor', 'children'),
-        Output("actor-input-store", "data"),
-        [Input('actor-input-box', 'value')]
+        [Input('actor-id-store', 'value')]
     )
-    def update_graph8(selected_actor):
+    def update_graph8(data):
+        print("pi")
+        if data is None:
+            raise PreventUpdate
+        data = data[0]
+        actor_id = data["actor_id"]
+        print(actor_id)
         #SQL query with selected genre filter
         query = f"""
         SELECT 
@@ -370,7 +376,7 @@ def callback_genres_by_actor(app, dbengine):
         JOIN genre  ON has_genre.genre_id = genre.genre_id
         JOIN works_on ON rating.title_id = works_on.title_id
         JOIN person ON works_on.person_id = person.person_id
-        WHERE person.primary_name = '{selected_actor}'
+        WHERE person.person_id = '{actor_id}'
         GROUP BY person.person_id, person.primary_name, genre
         ORDER BY film_count DESC;
         """
@@ -392,33 +398,28 @@ def callback_genres_by_actor(app, dbengine):
     )
 
         layout = go.Layout(
-            title=f'Film distribution by Genre for {selected_actor}',
+            title=f'Film distribution by Genre for {actor_id}',
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
         )
 
         fig = go.Figure(data=[pie_chart], layout=layout)
 
-        return dcc.Graph(figure=fig), {'actor_id': person_id, 'actor_name': person_name}
-
-    @app.callback(
-        Output("actor-header", "children"),
-        Output("actor-id-store", "data"),
-        Input("actor-input-store", "data")
-    )
-    def update_header(data):
-        return data['actor_name'], {'actor_id': data['actor_id']}
+        return dcc.Graph(figure=fig)
 
     @app.callback(
         Output("actor-image", "children"),
-        Input("actor-id-store", "data"),
+        Input("actor-id-store", "value"),
     )
     def update_image(data):
+        print("image")
+        if data is None:
+            raise PreventUpdate
+        data = data[0]
+        actor_id = data["actor_id"]
         headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36'}
 
-        actor_id = data['actor_id']
         url = f'https://www.imdb.com/name/{actor_id}/'
-        print(url)
 
         result = requests.get(url, headers=headers)
 
@@ -432,26 +433,28 @@ def callback_genres_by_actor(app, dbengine):
         except:
             print("oeps")
 
-
-def callback_most_grossing_by_actor(app, dbengine):
     @app.callback(
         Output('graph-grossing-by-actor', 'children'),
-        [Input('actor-input-box', 'value')]
+        [Input('actor-id-store', 'value')]
     )
-    def update_graph9(selected_actor):
+    def update_graph9(data):
+        if data is None:
+            raise PreventUpdate
+        data = data[0]
+        actor_id = data["actor_id"]
         # SQL query with selected genre filter
         query = f"""
-        SELECT t.primary_title as film, ROUND(AVG(f.revenue)) as revenue
-        FROM title t
-        JOIN finance f ON t.title_id = f.title_id
-        JOIN works_on ON t.title_id = works_on.title_id
-        JOIN person ON works_on.person_id = person.person_id
-        WHERE person.primary_name = '{selected_actor}'
-        and revenue is not null
-        group by t.primary_title
-        ORDER BY revenue desc
-        LIMIT 10
-        """
+            SELECT t.primary_title as film, ROUND(AVG(f.revenue)) as revenue
+            FROM title t
+            JOIN finance f ON t.title_id = f.title_id
+            JOIN works_on ON t.title_id = works_on.title_id
+            JOIN person ON works_on.person_id = person.person_id
+            WHERE person.person_id = '{actor_id}'
+            and revenue is not null
+            group by t.primary_title
+            ORDER BY revenue desc
+            LIMIT 10
+            """
         tabel = pd.read_sql(query, dbengine)
 
         # create a Dash DataTable component to display the query result
@@ -465,3 +468,97 @@ def callback_most_grossing_by_actor(app, dbengine):
         )
 
         return table
+
+
+
+
+def callback_search_for_staff(app, dbengine):
+
+
+    @app.callback(
+        [
+            Output("actor-id-store", "value"),
+            Output('actor-header', 'children'),
+            Output({"type": "actor-search-result", "actor_id": ALL, "actor_name": ALL}, "n_clicks"),
+            Output('actor-search-button', 'n_clicks'),
+        ],
+        [
+            State({"type": "actor-search-result", "actor_id": ALL, "actor_name": ALL}, "id"),
+            Input({"type": "actor-search-result", "actor_id": ALL, "actor_name": ALL}, "n_clicks"),
+        ]
+    )
+    def callback_func(data, n_clicks):
+        print(n_clicks)
+        n_clicks_array = []
+        for i in range(len(n_clicks)):
+            n_clicks_array.append(None)
+        for i in range(len(n_clicks)):
+            if (n_clicks[i] != None):
+                return [data[i]], data[i]["actor_name"], n_clicks_array, None
+        raise PreventUpdate
+
+    @app.callback(
+        [
+            Output('actor-search-results', 'children')
+        ],
+        [Input('actor-search-button', 'n_clicks'),
+         State('actor-search-input', 'value')]
+    )
+    def doe_dingen(n_clicks, selected_actor):
+        print(n_clicks)
+        if (n_clicks == None): return [[]]
+        print(selected_actor)
+        if (selected_actor != None):
+            query = f"""
+                SELECT person.person_id, person.primary_name, SUM(rating.num_votes) as votes
+                    FROM person
+                    INNER JOIN works_on
+                            ON person.person_id = works_on.person_id
+                    INNER JOIN rating
+                            ON works_on.title_id = rating.title_id
+                        WHERE
+                            UPPER(person.primary_name) LIKE UPPER('{selected_actor}%%')
+                            --AND (works_on.job_name = 'actor' OR works_on.job_name = 'actress')
+                    GROUP BY person.person_id
+                    ORDER BY votes DESC
+                LIMIT 5
+                """
+            tabel = pd.read_sql(query, dbengine)
+
+            result = []
+            print(tabel)
+            for _, row in tabel.iterrows():
+                result.append(html.P(f"{row['primary_name']}",
+                                     id={'type': 'actor-search-result', 'actor_id': row['person_id'],
+                                         'actor_name': row['primary_name']}))
+            print(result)
+            return [result]
+        else:
+            return []
+
+    # @app.callback(
+    #     [
+    #         Output('actor-search-results', 'style'),
+    #     ],
+    #     [
+    #         Input("actor-id-store", "value")
+    #     ]
+    # )
+    # def callback_func2(data):
+    #     print(data)
+    #     return [{'visibility': 'hidden'}]
+
+    # @app.callback(
+    #     [
+    #         Output('actor-search-results', 'style'),
+    #     ],
+    #     [
+    #         Input("visible", "value")
+    #     ]
+    # )
+    # def callback_func3(data):
+    #     print(data)
+    #     if (data == True):
+    #         return [{'visibility': 'visible'}]
+    #     else:
+    #         raise PreventUpdate
