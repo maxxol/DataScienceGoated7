@@ -7,12 +7,11 @@ from sqlalchemy import create_engine
 from dash import dcc as dcc
 from dash import html as html
 import dash_bootstrap_components as dbc
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
 from graph_callbacks import *
 
-dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
+dbengine = create_engine('postgresql://postgres:root@localhost/IMDB2')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/global.css','./assets/staffPage.css','./assets/genrePage.css'])
@@ -101,6 +100,7 @@ technical = html.Div([
 history = html.Div([
     html.H1("History"),
     html.Div(id='graph-historical-popularity', className="graph"),
+    html.Button(["Zie geplande projecten"], id="future-data-popularity", n_clicks=0)
     ],
     className="sub-container history"
 )

@@ -1,3 +1,5 @@
+import datetime
+
 import requests
 from bs4 import BeautifulSoup
 from dash import Output, Input, dash_table, html, State, ALL
@@ -193,30 +195,47 @@ def callback_bottom_gross_movies(app, dbengine):
 def callback_historical_popularity(app, dbengine):
     @app.callback(
         Output('graph-historical-popularity', 'children'),
-        [Input('select-genre', 'value')]
+        Input('select-genre', 'value'),
+        Input('future-data-popularity', 'n_clicks')
     )
-    def update_graph5(selected_genre):
+    def update_graph5(selected_genre, n_clicks):
+        future_distance_years = 5
+        now_year = datetime.datetime.now().year
+        now_month = datetime.datetime.now().month
+
+        future = False
+        year_condition = "start_year <= DATE_PART('year', CURRENT_DATE)"
+        time_range = [1950, now_year-1]
+        if n_clicks % 2 == 1:
+            future = True
+            year_condition = "start_year >= DATE_PART('year', CURRENT_DATE)"
+            time_range = [now_year+1, now_year+future_distance_years]
+
         # SQL query with selected genre filter
         query = f"""
     	SELECT start_year,count(title.title_id) AS film_count
     	FROM title
     	JOIN has_genre ON title.title_id = has_genre.title_id
     	JOIN genre ON has_genre.genre_id = genre.genre_id
-    	WHERE genre.genre_name = '{selected_genre}'
+    	WHERE genre.genre_name = '{selected_genre}' AND {year_condition}
     	group by start_year
         """
         tabel = pd.read_sql(query, dbengine)
+
+        projects_this_year = tabel[tabel['start_year'] == 2024]['film_count'].values[0]
+        predicted_projects_this_year = int(projects_this_year / now_month * 12)
+
 
         # create a line graph
         line_chart = go.Line(
             x=tabel['start_year'],
             y=tabel['film_count'],
-            marker=dict(color='blue')  # You can customize the color
+            marker=dict(color='blue'),  # You can customize the color,
         )
 
         layout = go.Layout(
             title=f'Historical popularity:  {selected_genre}',
-            xaxis=dict(title='year', range=[1950, 2026]),
+            xaxis=dict(title='year', range=time_range),
             yaxis=dict(title='films made'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -224,7 +243,21 @@ def callback_historical_popularity(app, dbengine):
 
         fig = go.Figure(data=[line_chart], layout=layout)
 
-        return dcc.Graph(figure=fig)
+        return html.Div([dcc.Graph(figure=fig),
+                         html.Span([f"{projects_this_year} {selected_genre} projecten tot dusver in {now_year}, "
+                                    f"dit voorspeld voor {selected_genre} projecten "
+                                    f"aan het eind van het jaar"]),
+                         ])
+
+    @app.callback(
+        Output('future-data-popularity', 'children'),
+        Input('future-data-popularity', 'n_clicks'),
+    )
+    def update_future_button(n_clicks):
+        output = "zie geplande projecten"
+        if n_clicks % 2 == 1:
+            output = "Zie afgeronde projecten"
+        return output
 
 
 def callback_popular_actors(app, dbengine):
