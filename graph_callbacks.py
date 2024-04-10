@@ -619,6 +619,7 @@ def callback_search_for_staff(app, dbengine):
             Output('actor-header', 'children'),
             Output({"type": "actor-search-result", "actor_id": ALL, "actor_name": ALL}, "n_clicks"),
             Output('actor-search-button', 'n_clicks'),
+            Output('actor-search-input', 'value'),
         ],
         [
             State({"type": "actor-search-result", "actor_id": ALL, "actor_name": ALL}, "id"),
@@ -632,12 +633,12 @@ def callback_search_for_staff(app, dbengine):
             n_clicks_array.append(None)
         for i in range(len(n_clicks)):
             if (n_clicks[i] != None):
-                return [data[i]], data[i]["actor_name"], n_clicks_array, None
+                return [data[i]], data[i]["actor_name"], n_clicks_array, None, data[i]["actor_name"]
         raise PreventUpdate
 
     @app.callback(
         [
-            Output('actor-search-results', 'children')
+            Output('actor-search-results', 'children'),
         ],
         [Input('actor-search-button', 'n_clicks'),
          State('actor-search-input', 'value')]

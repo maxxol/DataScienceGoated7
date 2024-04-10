@@ -142,7 +142,7 @@ searchBar = html.Div(
 )
 
 staffImage = html.Div(
-    html.Img(src=r'https://placehold.co/280x414', alt='image', className="image"),
+    "",
     id="actor-image",
     className="container-image",
 )
