@@ -109,10 +109,10 @@ def callback_top_genre_pairs(app, dbengine):
 def callback_top_gross_movies(app, dbengine):
     @app.callback(
         Output('graph-top-gross-movies', 'children'),
-        [Input('select-genre', 'value')]
+        [Input('select-genre', 'value'),
+         Input('gross-overview', 'n_clicks')]
     )
-    def update_graph3(selected_genre):
-        # SQL query with selected genre filter
+    def update_graph3(selected_genre, n_clicks):
         query = f"""
     	SELECT t.primary_title, ROUND(AVG(f.revenue))as revenue
         FROM title t
@@ -127,6 +127,22 @@ def callback_top_gross_movies(app, dbengine):
 
         LIMIT 10
         """
+        if n_clicks % 2 == 0:
+            query = f"""
+            SELECT  count(f.revenue), round((f.revenue::numeric / f.budget::numeric), 1) as bucket
+                FROM title t
+                JOIN finance f ON t.title_id = f.title_id
+                JOIN has_genre hg ON t.title_id = hg.title_id
+                where hg.genre_id = 1
+                and f.revenue is not null
+                and f.revenue > 100
+                and f.budget is not null
+                and f.budget > 100
+                group by bucket
+                ORDER BY bucket asc
+            """
+        # SQL query with selected genre filter
+
         tabel = pd.read_sql(query, dbengine)
 
         # create a bar graph

@@ -85,7 +85,7 @@ boxOffice = html.Div([
     html.H1("Box Office"),
     html.Div(id='graph-top-gross-movies', className="graph"),
     html.Div(id='graph-bottom-gross-movies', className="graph"),
-    html.Button(id='gross-over')
+    html.Button("Ratio overzicht", id='gross-overview')
     ],
     className="sub-container box-office"
 )
