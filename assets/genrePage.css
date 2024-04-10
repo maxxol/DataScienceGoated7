@@ -17,7 +17,11 @@
   width: 30%;
   height: 75px;
   flex: 1;
-  background-color: #dedede;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(246, 212, 185);
+}
+.container-genre .container-genre-top .container-dropdown #select-genre {
+  color: black;
 }
 @media screen and (max-width: 512px) {
   .container-genre .container-genre-top .container-dropdown {
@@ -32,7 +36,8 @@
   width: 70%;
   height: 75px;
   flex: 2;
-  background-color: #dedede;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(246, 212, 185);
 }
 @media screen and (max-width: 512px) {
   .container-genre .container-genre-top .header {
@@ -57,7 +62,8 @@
   gap: 24px;
   flex-direction: column;
   align-items: center;
-  background-color: #dedede;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(246, 212, 185);
 }
 .container-genre .container-genre-bottom .sub-container h1 {
   width: 100%;

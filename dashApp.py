@@ -11,7 +11,7 @@ from sentiment import analyze_sentiment  # Import the sentiment analysis method
 
 from graph_callbacks import *
 
-dbengine = create_engine('postgresql://postgres:root@localhost/IMDB2')
+dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
 dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
 
 app = Dash("MovieDash", external_stylesheets=['./assets/global.css','./assets/staffPage.css','./assets/genrePage.css'])
@@ -24,7 +24,7 @@ callback_historical_popularity(app, dbengine)
 callback_popular_actors(app, dbengine)
 callback_popular_directors(app, dbengine)
 callback_genres_by_actor(app, dbengine)
-# callback_most_grossing_by_actor(app, dbengine) functie bestaat niet meer
+callback_most_grossing_by_actor(app, dbengine)
 callback_search_for_staff(app, dbengine)
 
 genre_options = [
@@ -132,10 +132,10 @@ searchBar = html.Div(
             html.Div([
 
             ], id="actor-search-results", className="results-container"),
-            dcc.Input(id="actor-search-input", placeholder="Search...", type="text", className="search-bar"),
+            dcc.Input(id="actor-search-input", placeholder="Typ hier...", type="text", className="search-bar"),
         ], className="container-container"),
 
-        html.Button(id="actor-search-button", children="Find Actors", className=""),
+        html.Button(id="actor-search-button", children="Zoek", className=""),
         dcc.Store(id="actor-id-store"),
     ],
     className="search-bar-container"
@@ -148,12 +148,13 @@ staffImage = html.Div(
 )
 
 staffBio = html.Div(
-    "Bio info you know whats up",
+    "",
+    id="container-bio",
     className="container-bio",
 )
 
 header = html.H1(
-    "Acteur Naam (of zo?)",
+    "",
     id="actor-header",
     className="header",
 )

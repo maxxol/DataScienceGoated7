@@ -3,27 +3,35 @@ html, body, div#react-entry-point {
   height: 100%;
 }
 
+html {
+  background: url(https://i.pinimg.com/originals/a1/33/bd/a133bdb6723cc29d4775d13070447c9e.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 .navbar {
   display: flex;
   border: #333 solid;
   border-width: 0 0 3px 0;
   padding: 15px 0 0 25px;
+  background-color: rgb(60, 6, 2);
   margin: 0;
 }
 .navbar a {
-  background-color: #dedede;
-  color: #333;
+  background-color: rgb(173, 39, 27);
+  color: rgb(246, 212, 185);
+  font-weight: bolder;
   font-size: 16px;
-  font-weight: 400;
   text-align: center;
   padding: 10px 15px;
   margin: 0 -3px -3px 0;
   text-decoration: none;
-  border: #333 solid 3px;
   border-radius: 8px 8px 0 0;
 }
 .navbar a.active {
-  background-color: white;
+  background-color: rgb(248, 131, 64);
   border-bottom: 0;
 }
 

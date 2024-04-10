@@ -10,6 +10,18 @@ import pandas as pd
 from dash import dcc as dcc
 from dash.exceptions import PreventUpdate
 
+off_white = 'rgb(246, 212, 185)'
+red = 'rgb(173, 39, 27)'
+dark_red = 'rgb(60, 6, 2)'
+orange = 'rgb(248, 131, 64)'
+
+off_white2 = 'rgb(130, 112, 97)'
+red2 = 'rgb(91, 20, 14)'
+dark_red2 = 'rgb(31, 3, 1)'
+orange2 = 'rgb(131, 69, 33)'
+
+font_color = off_white
+marker_color = red
 
 def callback_rating_vs_runtime(app, dbengine):
     @app.callback(
@@ -31,14 +43,23 @@ def callback_rating_vs_runtime(app, dbengine):
 
         #create line graph
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=tabel['run_time_minutes'], y=tabel['avg_rating'],
-                                  mode='lines',
-                                  name='Rating vs Runtime'))
+        fig.add_trace(go.Scatter(
+            x=tabel['run_time_minutes'],
+            y=tabel['avg_rating'],
+            mode='lines',
+            name='Rating vs Runtime',
+            marker=dict(
+                color=marker_color,
+            ),
+        ))
         fig.update_layout(title='Rating vs Runtime',
                           xaxis_title='Runtime (minutes)',
                           yaxis_title='Average Rating',
                           paper_bgcolor='rgba(0,0,0,0)',
                           plot_bgcolor='rgba(0,0,0,0)',
+                          font=dict(
+                              color='rgb(246, 212, 185)',
+                          ),
                           )
         fig.update_xaxes(range=[0, 200])  # Set the y-axis upper bound to 30
 
@@ -68,12 +89,11 @@ def callback_top_genre_pairs(app, dbengine):
             JOIN 
                 genre g2 ON hr2.genre_id = g2.genre_id
             WHERE 
-                g1.genre_id < g2.genre_id -- Ensures that we only get unique pairs of genre
-                AND g1.genre_name = '{selected_genre}'  -- Filter by selected genre
+                g1.genre_name = 'Western'  -- Filter by selected genre, using case-insensitive comparison
             GROUP BY 
                 genre1, genre2
             HAVING 
-                g1.genre_name <> g2.genre_name -- Exclude pairs of the same genre
+                LOWER(g1.genre_name) <> LOWER(g2.genre_name) -- Exclude pairs of the same genre, using case-insensitive comparison
         )
         SELECT 
             genre1,
@@ -90,7 +110,12 @@ def callback_top_genre_pairs(app, dbengine):
         bar_chart = go.Bar(
             x=tabel['genre2'],
             y=tabel['frequency'],
-            marker=dict(color='blue')
+            marker=dict(
+                color=marker_color,
+                line=dict(
+                    width=0
+                )
+            ),
         )
 
         layout = go.Layout(
@@ -99,6 +124,9 @@ def callback_top_genre_pairs(app, dbengine):
             yaxis=dict(title='Frequency'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
@@ -109,10 +137,9 @@ def callback_top_genre_pairs(app, dbengine):
 def callback_top_gross_movies(app, dbengine):
     @app.callback(
         Output('graph-top-gross-movies', 'children'),
-        [Input('select-genre', 'value'),
-         Input('gross-overview', 'n_clicks')]
+        Input('select-genre', 'value')
     )
-    def update_graph3(selected_genre, n_clicks):
+    def update_graph3(selected_genre):
         query = f"""
     	SELECT t.primary_title, ROUND(AVG(f.revenue))as revenue
         FROM title t
@@ -127,20 +154,6 @@ def callback_top_gross_movies(app, dbengine):
 
         LIMIT 10
         """
-        if n_clicks % 2 == 0:
-            query = f"""
-            SELECT  count(f.revenue), round((f.revenue::numeric / f.budget::numeric), 1) as bucket
-                FROM title t
-                JOIN finance f ON t.title_id = f.title_id
-                JOIN has_genre hg ON t.title_id = hg.title_id
-                where hg.genre_id = 1
-                and f.revenue is not null
-                and f.revenue > 100
-                and f.budget is not null
-                and f.budget > 100
-                group by bucket
-                ORDER BY bucket asc
-            """
         # SQL query with selected genre filter
 
         tabel = pd.read_sql(query, dbengine)
@@ -149,7 +162,12 @@ def callback_top_gross_movies(app, dbengine):
         bar_chart = go.Bar(
             x=tabel['primary_title'],
             y=tabel['revenue'],
-            marker=dict(color='blue')
+            marker=dict(
+                color=marker_color,
+                line=dict(
+                    width=0
+                )
+            ),
         )
 
         layout = go.Layout(
@@ -158,6 +176,9 @@ def callback_top_gross_movies(app, dbengine):
             yaxis=dict(title='earnings'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
@@ -192,7 +213,12 @@ def callback_bottom_gross_movies(app, dbengine):
         bar_chart = go.Bar(
             x=tabel['primary_title'],
             y=tabel['revenue'],
-            marker=dict(color='blue')
+            marker=dict(
+                color=marker_color,
+                line=dict(
+                    width=0
+                )
+            ),
         )
 
         layout = go.Layout(
@@ -201,6 +227,9 @@ def callback_bottom_gross_movies(app, dbengine):
             yaxis=dict(title='earnings'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
@@ -246,7 +275,9 @@ def callback_historical_popularity(app, dbengine):
         line_chart = go.Line(
             x=tabel['start_year'],
             y=tabel['film_count'],
-            marker=dict(color='blue'),  # You can customize the color,
+            marker=dict(
+                color=marker_color,
+            ),
         )
 
         layout = go.Layout(
@@ -255,6 +286,9 @@ def callback_historical_popularity(app, dbengine):
             yaxis=dict(title='films made'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
 
         fig = go.Figure(data=[line_chart], layout=layout)
@@ -319,9 +353,9 @@ def callback_popular_actors(app, dbengine):
             mode='markers',
             marker=dict(
                 size=tabel['film_count'] * bubble_scale,  # Adjusting the bubble size
-                color='blue',
+                color=marker_color,
                 opacity=0.5,
-                line=dict(width=0.5, color='DarkSlateGrey')
+                line=dict(width=0.5, color=marker_color)
             ),
             text=tabel[['name', 'film_count', 'rating']].apply(
                 lambda x: f"Name: {x['name']}<br>Film Count: {x['film_count']}<br>Rating: {x['rating']}", axis=1)
@@ -334,6 +368,9 @@ def callback_popular_actors(app, dbengine):
             yaxis=dict(title='Average Rating', range=[0, 10]),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
         fig = go.Figure(data=[scatter], layout=layout)
         return dcc.Graph(figure=fig)
@@ -381,9 +418,9 @@ def callback_popular_directors(app, dbengine):
             mode='markers',
             marker=dict(
                 size=tabel['film_count'] * bubble_scale,  # adjusting the bubble size
-                color='blue',
+                color=marker_color,
                 opacity=0.5,
-                line=dict(width=0.5, color='DarkSlateGrey')
+                line=dict(width=0.5, color=marker_color)
             ),
             text=tabel[['name', 'film_count', 'rating']].apply(
                 lambda x: f"Name: {x['name']}<br>Film Count: {x['film_count']}<br>Rating: {x['rating']}", axis=1)
@@ -396,6 +433,9 @@ def callback_popular_directors(app, dbengine):
             yaxis=dict(title='Average Rating', range=[0, 10]),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
         fig = go.Figure(data=[scatter], layout=layout)
         return dcc.Graph(figure=fig)
@@ -443,12 +483,15 @@ def callback_genres_by_actor(app, dbengine):
         pie_chart = go.Pie(
         labels=tabel['genre'],
         values=tabel['film_count'],
-        marker=dict(colors=['blue', 'cyan', 'lime', 'green', 'yellow', 'orange', 'red', 'pink', 'purple'] * len(tabel))  # R A I N B O W
+        marker=dict(colors=[off_white, orange, red, dark_red, off_white2, orange2, red2, dark_red2] * len(tabel))  # R A I N B O W
     )
 
         layout = go.Layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color='rgb(246, 212, 185)',
+            ),
         )
 
         fig = go.Figure(data=[pie_chart], layout=layout)
@@ -456,7 +499,8 @@ def callback_genres_by_actor(app, dbengine):
         return dcc.Graph(figure=fig)
 
     @app.callback(
-        Output("actor-image", "children"),
+        [Output("actor-image", "children"),
+        Output("container-bio", "children"),],
         Input("actor-id-store", "value"),
     )
     def update_image(data):
@@ -467,7 +511,7 @@ def callback_genres_by_actor(app, dbengine):
         actor_id = data["actor_id"]
         headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Mobile Safari/537.36'}
 
-        url = f'https://www.imdb.com/name/{actor_id}/'
+        url = f'https://www.imdb.com/name/{actor_id}'
 
         result = requests.get(url, headers=headers)
 
@@ -476,49 +520,24 @@ def callback_genres_by_actor(app, dbengine):
         try:
             container_div = soup.find("div", attrs={'class': "ipc-poster"})
             image = container_div.find("img")
-            return html.Img(src=image["src"], alt='image', className="image"),
+            print(image)
+
+            container_bio = soup.find("div", attrs={'data-testid': "bio-content"})
+            bio = container_bio.find("div", attrs={'class': "ipc-html-content-inner-div"}).get_text()
+
+            return html.Img(src=image["src"], alt='image', className="image"), [html.P([bio])]
 
         except:
             print("oeps")
 
+def callback_most_grossing_by_actor(app, dbengine):
     @app.callback(
-        [
-            Output('graph-grossing-by-actor', 'children'),
-            Output('sentiment-results', 'children'),
-            Output('wordcloud-container', 'children'),
-        ],
-        [Input('actor-id-store', 'value'),],
+        Output('graph-grossing-by-actor', 'children'),
+        [Input('actor-id-store', 'value')]
     )
     def update_graph9(data):
-        print('---update-graph9---')
-        def update_sentiment_and_wordcloud(n_clicks, keyword):
-            if n_clicks and keyword:  # Check if button is clicked and keyword is provided
-                sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
-                # Define CSS styles based on sentiment score
-                if sentiment_results >= 6.5:
-                    sentiment_style = {'background-color': 'lime', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
-                elif sentiment_results < 6.5 and sentiment_results >= 5.5:
-                    sentiment_style = {'background-color': 'yellow', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
-                else:
-                    sentiment_style = {'background-color': 'red', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
-
-                # Convert newline characters to <br> tags within a <pre> tag
-                sentiment_results_html = html.Div(html.Pre(sentiment_results), style=sentiment_style)
-
-                wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto','border': '1px solid black','margin': '5px'})  # Create image element for word cloud with adjusted size
-
-                # Return sentiment analysis results and word cloud image
-                return (
-                    html.Div([
-                        html.H3(f"Sentiment Analysis Results for '{keyword}'"),
-                        sentiment_results_html
-                    ]),
-                    wordcloud_img
-                )
-
-            return None, None
-
-
+        print("REVENTUIEEE")
+        print(data)
         if data is None:
             raise PreventUpdate
 
@@ -526,6 +545,7 @@ def callback_genres_by_actor(app, dbengine):
 
         actor_id = data["actor_id"]
         actor_name = data["actor_name"]
+        print(actor_id)
         # SQL query with selected genre filter
         query = f"""
             SELECT t.primary_title as film, ROUND(AVG(f.revenue)) as revenue
@@ -547,20 +567,52 @@ def callback_genres_by_actor(app, dbengine):
             columns=[{"name": i, "id": i} for i in tabel.columns],
             data=tabel.to_dict('records'),
             style_table={'overflowX': 'scroll'},
-            style_header={'backgroundColor': 'lightgrey', 'fontWeight': 'bold'},
-            style_data={'whiteSpace': 'normal', 'height': 'auto'}
+            style_header={'backgroundColor': dark_red, 'color': font_color, 'fontWeight': 'bold', 'border': 'none'},
+            style_data={'whiteSpace': 'normal', 'height': 'auto', 'backgroundColor': red, 'color': font_color, 'border': 'none', 'border-bottom': dark_red+' solid 2px'},
         )
 
-        actor_sentiment, actor_wordcloud = update_sentiment_and_wordcloud(1, actor_name)
+        return table
 
-        return table, actor_sentiment, actor_wordcloud
+    @app.callback(
+        [
+            Output('sentiment-results', 'children'),
+            Output('wordcloud-container', 'children'),
+        ],
+        [Input('actor-id-store', 'value'),],
+    )
+    def update_sentiment_and_wordcloud(data):
+        data = data[0]
 
+        actor_id = data["actor_id"]
+        keyword = data["actor_name"]
 
+        if keyword:  # Check if button is clicked and keyword is provided
+            sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
+            # Define CSS styles based on sentiment score
+            if sentiment_results >= 6.5:
+                sentiment_style = {'background-color': off_white, 'color': 'black', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+            elif 6.5 > sentiment_results >= 5.5:
+                sentiment_style = {'background-color': orange, 'color': off_white, 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+            else:
+                sentiment_style = {'background-color': red, 'color': off_white, 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
 
+            # Convert newline characters to <br> tags within a <pre> tag
+            sentiment_results_html = html.Div(html.Pre(sentiment_results), style=sentiment_style)
+
+            wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto','border': '1px solid black','margin': '5px'})  # Create image element for word cloud with adjusted size
+
+            # Return sentiment analysis results and word cloud image
+            return (
+                html.Div([
+                    html.H3(f"Sentiment Analysis Results for '{keyword}'"),
+                    sentiment_results_html
+                ]),
+                wordcloud_img
+            )
+
+        return None, None
 
 def callback_search_for_staff(app, dbengine):
-
-
     @app.callback(
         [
             Output("actor-id-store", "value"),
@@ -621,30 +673,3 @@ def callback_search_for_staff(app, dbengine):
             return [result]
         else:
             return []
-
-    # @app.callback(
-    #     [
-    #         Output('actor-search-results', 'style'),
-    #     ],
-    #     [
-    #         Input("actor-id-store", "value")
-    #     ]
-    # )
-    # def callback_func2(data):
-    #     print(data)
-    #     return [{'visibility': 'hidden'}]
-
-    # @app.callback(
-    #     [
-    #         Output('actor-search-results', 'style'),
-    #     ],
-    #     [
-    #         Input("visible", "value")
-    #     ]
-    # )
-    # def callback_func3(data):
-    #     print(data)
-    #     if (data == True):
-    #         return [{'visibility': 'visible'}]
-    #     else:
-    #         raise PreventUpdate
