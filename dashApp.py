@@ -176,7 +176,10 @@ graphContainer = html.Div(
 )
 
 sentimentContainer = html.Div(
-    "",
+    [
+        html.Div(id='sentiment-results'),
+        html.Div(id='wordcloud-container')
+     ],
     className="container-sentiment",
 
 )
@@ -232,8 +235,7 @@ pageC = dbc.Container(
                         dcc.Input(id='keyword-input', type='text', placeholder='Enter keyword'),
                         html.Button('Analyze Sentiment', id='analyze-button', n_clicks=0)
                     ]),
-                    html.Div(id='sentiment-results'),  # Placeholder for sentiment analysis results
-                    html.Div(id='wordcloud-container')  # Placeholder for word cloud image
+                      # Placeholder for word cloud image
                 ]), width=8, style={'border': '1px solid black', 'padding': '10px'}),
                 
             ]
@@ -291,12 +293,12 @@ def update_graph(value):
     return px.line(dff, x='year', y='pop')
 
 # Callback to update sentiment results and word cloud
-@app.callback(
-    Output('sentiment-results', 'children'),
-    Output('wordcloud-container', 'children'),
-    Input('analyze-button', 'n_clicks'),
-    State('keyword-input', 'value')
-)
+# @app.callback(
+#     Output('sentiment-results', 'children'),
+#     Output('wordcloud-container', 'children'),
+#     Input('analyze-button', 'n_clicks'),
+#     State('keyword-input', 'value')
+# )
 def update_sentiment_and_wordcloud(n_clicks, keyword):
     if n_clicks and keyword:  # Check if button is clicked and keyword is provided
         sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function

@@ -1,5 +1,5 @@
 import datetime
-
+from sentiment import analyze_sentiment
 import requests
 from bs4 import BeautifulSoup
 from dash import Output, Input, dash_table, html, State, ALL
@@ -245,7 +245,7 @@ def callback_historical_popularity(app, dbengine):
 
         return html.Div([dcc.Graph(figure=fig),
                          html.Span([f"{projects_this_year} {selected_genre} projecten tot dusver in {now_year}, "
-                                    f"dit voorspeld voor {selected_genre} projecten "
+                                    f"dit voorspeld voor {predicted_projects_this_year} projecten "
                                     f"aan het eind van het jaar"]),
                          ])
 
@@ -427,11 +427,10 @@ def callback_genres_by_actor(app, dbengine):
         pie_chart = go.Pie(
         labels=tabel['genre'],
         values=tabel['film_count'],
-        marker=dict(colors=['blue', 'cyan' ,'lime', 'green', 'yellow', 'orange', 'red', 'pink', 'purple'] * len(tabel))  # R A I N B O W
+        marker=dict(colors=['blue', 'cyan', 'lime', 'green', 'yellow', 'orange', 'red', 'pink', 'purple'] * len(tabel))  # R A I N B O W
     )
 
         layout = go.Layout(
-            title=f'Film distribution by Genre for {actor_id}',
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
         )
@@ -467,14 +466,50 @@ def callback_genres_by_actor(app, dbengine):
             print("oeps")
 
     @app.callback(
-        Output('graph-grossing-by-actor', 'children'),
-        [Input('actor-id-store', 'value')]
+        [
+            Output('graph-grossing-by-actor', 'children'),
+            Output('sentiment-results', 'children'),
+            Output('wordcloud-container', 'children'),
+        ],
+        [Input('actor-id-store', 'value'),],
     )
     def update_graph9(data):
+        print('---update-graph9---')
+        def update_sentiment_and_wordcloud(n_clicks, keyword):
+            if n_clicks and keyword:  # Check if button is clicked and keyword is provided
+                sentiment_results, wordcloud_base64 = analyze_sentiment(keyword)  # Call analyze_sentiment function
+                # Define CSS styles based on sentiment score
+                if sentiment_results >= 6.5:
+                    sentiment_style = {'background-color': 'lime', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+                elif sentiment_results < 6.5 and sentiment_results >= 5.5:
+                    sentiment_style = {'background-color': 'yellow', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+                else:
+                    sentiment_style = {'background-color': 'red', 'padding': '5px','margin': '5px', 'display': 'inline-block', 'border': '1px solid black'}
+
+                # Convert newline characters to <br> tags within a <pre> tag
+                sentiment_results_html = html.Div(html.Pre(sentiment_results), style=sentiment_style)
+
+                wordcloud_img = html.Img(src='data:image/png;base64,{}'.format(wordcloud_base64), style={'width': '50%', 'height': 'auto','border': '1px solid black','margin': '5px'})  # Create image element for word cloud with adjusted size
+
+                # Return sentiment analysis results and word cloud image
+                return (
+                    html.Div([
+                        html.H3(f"Sentiment Analysis Results for '{keyword}'"),
+                        sentiment_results_html
+                    ]),
+                    wordcloud_img
+                )
+
+            return None, None
+
+
         if data is None:
             raise PreventUpdate
+
         data = data[0]
+
         actor_id = data["actor_id"]
+        actor_name = data["actor_name"]
         # SQL query with selected genre filter
         query = f"""
             SELECT t.primary_title as film, ROUND(AVG(f.revenue)) as revenue
@@ -500,7 +535,9 @@ def callback_genres_by_actor(app, dbengine):
             style_data={'whiteSpace': 'normal', 'height': 'auto'}
         )
 
-        return table
+        actor_sentiment, actor_wordcloud = update_sentiment_and_wordcloud(1, actor_name)
+
+        return table, actor_sentiment, actor_wordcloud
 
 
 
