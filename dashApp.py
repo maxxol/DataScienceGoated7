@@ -8,11 +8,10 @@ from dash import dcc as dcc
 from dash import html as html
 import dash_bootstrap_components as dbc
 from sentiment import analyze_sentiment  # Import the sentiment analysis method
-
 from graph_callbacks import *
 
 dbengine = create_engine('postgresql://postgres:1234@localhost/movie')
-dt = pd.read_sql('SELECT * FROM title_basics WHERE primary_title = \'Top Gun\'', dbengine)
+
 
 app = Dash("MovieDash", external_stylesheets=['./assets/global.css','./assets/staffPage.css','./assets/genrePage.css'])
 
@@ -332,3 +331,5 @@ def update_sentiment_and_wordcloud(n_clicks, keyword):
 
 if __name__ == '__main__':
     app.run(debug=False)
+
+#%%
