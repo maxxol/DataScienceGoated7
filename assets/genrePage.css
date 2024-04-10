@@ -1,0 +1,87 @@
+.container-genre {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.container-genre .container-genre-top {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.container-genre .container-genre-top .container-dropdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30%;
+  height: 75px;
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(246, 212, 185);
+}
+.container-genre .container-genre-top .container-dropdown #select-genre {
+  color: black;
+}
+@media screen and (max-width: 512px) {
+  .container-genre .container-genre-top .container-dropdown {
+    min-width: 60%;
+    height: 40px;
+  }
+}
+.container-genre .container-genre-top .container-dropdown #select-genre {
+  width: 75%;
+}
+.container-genre .container-genre-top .header {
+  width: 70%;
+  height: 75px;
+  flex: 2;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(246, 212, 185);
+}
+@media screen and (max-width: 512px) {
+  .container-genre .container-genre-top .header {
+    min-width: 60%;
+    height: 40px;
+  }
+}
+.container-genre .container-genre-bottom {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.container-genre .container-genre-bottom .sub-container {
+  padding: 24px 85px;
+  flex: 1;
+  min-width: 35%;
+  display: flex;
+  gap: 24px;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: rgb(246, 212, 185);
+}
+.container-genre .container-genre-bottom .sub-container h1 {
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+.container-genre .container-genre-bottom .sub-container .graph {
+  width: 100%;
+}
+@media screen and (max-width: 1500px) {
+  .container-genre .container-genre-bottom .sub-container {
+    min-width: 60%;
+  }
+}
+@media screen and (max-width: 768px) {
+  .container-genre .container-genre-bottom .sub-container {
+    padding: 0;
+  }
+}
+
+/*# sourceMappingURL=genrePage.css.map */

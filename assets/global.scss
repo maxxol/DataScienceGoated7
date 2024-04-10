@@ -1,0 +1,42 @@
+html,body,div#react-entry-point {
+    margin: 0;
+    height: 100%;
+}
+
+html {
+  background: url(https://i.pinimg.com/originals/a1/33/bd/a133bdb6723cc29d4775d13070447c9e.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+@import "variables";
+
+.navbar {
+    display: flex;
+    border: #333 solid;
+    border-width: 0 0 3px 0;
+    padding: 15px 0 0 25px;
+    background-color: $darkest_red;
+    margin: 0;
+
+    a {
+        background-color: $dark_red;
+        color: $off_white;
+        font-weight: bolder;
+        font-size: 16px;
+        //font-weight: 400;
+        text-align: center;
+        padding: 10px 15px;
+        margin: 0 -3px -3px 0;
+        text-decoration: none;
+        //border: $dark_red solid 3px;
+        border-radius: 8px 8px 0 0;
+
+        &.active {
+            background-color: $orange;
+            border-bottom: 0;
+        }
+    }
+}
