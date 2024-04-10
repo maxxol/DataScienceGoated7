@@ -85,6 +85,7 @@ boxOffice = html.Div([
     html.H1("Box Office"),
     html.Div(id='graph-top-gross-movies', className="graph"),
     html.Div(id='graph-bottom-gross-movies', className="graph"),
+    html.Button()
     ],
     className="sub-container box-office"
 )
@@ -247,9 +248,8 @@ pageC = dbc.Container(
 
 pages = {
     '/': {'name': 'Home', 'content': html.Div(children="Dit is de homepagina")},
-    '/page1': {'name': 'PageA', 'content': pageA},
-    '/page2': {'name': 'PageB', 'content': pageB},
-    '/page3': {'name': 'PageC', 'content': pageC},
+    '/page1': {'name': "Genre's" , 'content': pageA},
+    '/page2': {'name': 'Personen', 'content': pageB},
 }
 
 # Define app layout
