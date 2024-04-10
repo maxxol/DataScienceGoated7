@@ -49,7 +49,7 @@ def callback_rating_vs_runtime(app, dbengine):
             mode='lines',
             name='Rating vs Runtime',
             marker=dict(
-                color=marker_color,
+                color=off_white,
             ),
         ))
         fig.update_layout(title='Rating vs Runtime',
@@ -62,6 +62,8 @@ def callback_rating_vs_runtime(app, dbengine):
                           ),
                           )
         fig.update_xaxes(range=[0, 200])  # Set the y-axis upper bound to 30
+        fig.update_xaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
+        fig.update_yaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
 
         return dcc.Graph(figure=fig)
 
@@ -130,6 +132,7 @@ def callback_top_genre_pairs(app, dbengine):
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor=off_white)
 
         return dcc.Graph(figure=fig)
 
@@ -182,6 +185,7 @@ def callback_top_gross_movies(app, dbengine):
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor=off_white)
 
         return dcc.Graph(figure=fig)
 
@@ -233,6 +237,7 @@ def callback_bottom_gross_movies(app, dbengine):
         )
 
         fig = go.Figure(data=[bar_chart], layout=layout)
+        fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor=off_white)
 
         return dcc.Graph(figure=fig)
 
@@ -276,7 +281,7 @@ def callback_historical_popularity(app, dbengine):
             x=tabel['start_year'],
             y=tabel['film_count'],
             marker=dict(
-                color=marker_color,
+                color=off_white,
             ),
         )
 
@@ -287,11 +292,13 @@ def callback_historical_popularity(app, dbengine):
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font=dict(
-                color='rgb(246, 212, 185)',
+                color=off_white,
             ),
         )
 
         fig = go.Figure(data=[line_chart], layout=layout)
+        fig.update_xaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
+        fig.update_yaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
 
         return html.Div([dcc.Graph(figure=fig),
                          html.Span([f"{projects_this_year} {selected_genre} projecten tot dusver in {now_year}, "
@@ -345,7 +352,7 @@ def callback_popular_actors(app, dbengine):
 
         """
         tabel = pd.read_sql(query, dbengine)
-        bubble_scale = 1
+        bubble_scale = 2
         # create a bubble plot
         scatter = go.Scatter(
             x=tabel['revenue'],
@@ -353,9 +360,9 @@ def callback_popular_actors(app, dbengine):
             mode='markers',
             marker=dict(
                 size=tabel['film_count'] * bubble_scale,  # Adjusting the bubble size
-                color=marker_color,
+                color=off_white,
                 opacity=0.5,
-                line=dict(width=0.5, color=marker_color)
+                line=dict(width=0.5, color=off_white)
             ),
             text=tabel[['name', 'film_count', 'rating']].apply(
                 lambda x: f"Name: {x['name']}<br>Film Count: {x['film_count']}<br>Rating: {x['rating']}", axis=1)
@@ -369,10 +376,12 @@ def callback_popular_actors(app, dbengine):
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font=dict(
-                color='rgb(246, 212, 185)',
+                color=off_white,
             ),
         )
         fig = go.Figure(data=[scatter], layout=layout)
+        fig.update_xaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
+        fig.update_yaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
         return dcc.Graph(figure=fig)
 
 
@@ -410,7 +419,7 @@ def callback_popular_directors(app, dbengine):
 
         """
         tabel = pd.read_sql(query, dbengine)
-        bubble_scale = 1
+        bubble_scale = 2
         # create a bubble plot
         scatter = go.Scatter(
             x=tabel['revenue'],
@@ -418,9 +427,9 @@ def callback_popular_directors(app, dbengine):
             mode='markers',
             marker=dict(
                 size=tabel['film_count'] * bubble_scale,  # adjusting the bubble size
-                color=marker_color,
+                color=off_white,
                 opacity=0.5,
-                line=dict(width=0.5, color=marker_color)
+                line=dict(width=0.5, color=off_white)
             ),
             text=tabel[['name', 'film_count', 'rating']].apply(
                 lambda x: f"Name: {x['name']}<br>Film Count: {x['film_count']}<br>Rating: {x['rating']}", axis=1)
@@ -434,10 +443,12 @@ def callback_popular_directors(app, dbengine):
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font=dict(
-                color='rgb(246, 212, 185)',
+                color=off_white,
             ),
         )
         fig = go.Figure(data=[scatter], layout=layout)
+        fig.update_xaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
+        fig.update_yaxes(showgrid=True, gridwidth=2, gridcolor='rgba(0,0,0,0.4)')
         return dcc.Graph(figure=fig)
 
 
